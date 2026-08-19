@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tapendu Pal — Technologist &amp; AI Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+<div id="scrollProgress"></div>
+
+<div id="pageContent">
+
+<header>
+  <div class="wrap">
+    <nav>
+      <div class="logo">TP<span>.</span></div>
+      <div class="navlinks">
+        <a href="#about">About</a>
+        <a href="#skills">Skills</a>
+        <a href="#projects">Projects</a>
+        <a href="#experience">Experience</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <a class="navcta" href="#contact">// get in touch</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- HERO -->
+  <section class="hero wrap" style="padding-top:64px;">
+    <div>
+      <div class="eyebrow">Technologist · AI-Native Builder</div>
+      <h1>I build with AI.<br><em>Every single day.</em></h1>
+      <p class="lede">I'm Tapendu Pal — an engineer who lives at the intersection of software and applied AI. I use tools like GitHub Copilot, ChatGPT, and Claude to design, prototype, and ship my own projects — and to think through problems faster than I could alone.</p>
+      <div class="hero-ctas">
+        <a href="#projects" class="btn btn-primary">See what I'm building →</a>
+        <a href="#contact" class="btn btn-ghost">Contact me</a>
+      </div>
+    </div>
+
+    <div class="console" id="consoleBox" role="img" aria-label="Terminal animation showing a passing status log of career facts">
+      <div class="console-bar">
+        <span class="dot" style="background:#E5645C"></span>
+        <span class="dot" style="background:#E3B341"></span>
+        <span class="dot" style="background:#74D9AE"></span>
+        <span class="console-title">whoami.log</span>
+      </div>
+      <div class="console-body" id="consoleBody"></div>
+    </div>
+  </section>
+
+  <!-- STATUS BAR -->
+  <div class="statusbar">
+    <div class="wrap">
+      <div class="stat"><div class="num">2+ yrs</div><div class="label">// building &amp; shipping software</div></div>
+      <div class="stat"><div class="num">Copilot·GPT·Claude</div><div class="label">// daily AI stack</div></div>
+      <div class="stat"><div class="num">Builder</div><div class="label">// personal AI projects</div></div>
+      <div class="stat"><div class="num">B.Tech</div><div class="label">// computer science</div></div>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <section id="about" class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">About</div>
+      <h2>Engineer first. AI-native by choice.</h2>
+    </div>
+    <div class="about-grid reveal">
+      <p>Tech has always been the thing I gravitate to — not just as a job, but as a hobby. Somewhere in the last couple of years, AI stopped being a buzzword for me and became a daily working tool: I prompt, iterate, and build with it the way other people reach for a text editor.</p>
+      <p>I spend my free time experimenting with <strong>AI-assisted development</strong> — turning ideas into working projects, exploring <strong>prompt engineering</strong>, and figuring out how far AI tooling can take a solo builder. Professionally, I bring the same mindset into enterprise software engineering, where I build and validate systems at scale. The common thread is simple: I like making things that work, faster and smarter, with AI as a genuine collaborator.</p>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills" class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">Skills</div>
+      <h2>What I work with</h2>
+      <p>AI-first tooling, backed by solid software engineering fundamentals.</p>
+    </div>
+
+    <div class="coverage reveal">
+      <div class="cov-cell lead">
+        <div class="cov-head"><h4>AI &amp; Prompt Engineering</h4><span class="count">04</span></div>
+        <div class="chip-row"><span class="chip">GitHub Copilot</span><span class="chip">ChatGPT</span><span class="chip">Claude</span><span class="chip">Prompt Engineering</span></div>
+      </div>
+      <div class="cov-cell">
+        <div class="cov-head"><h4>Automation</h4><span class="count">02</span></div>
+        <div class="chip-row"><span class="chip">Java-Selenium</span><span class="chip">Playwright</span></div>
+      </div>
+      <div class="cov-cell">
+        <div class="cov-head"><h4>Frameworks</h4><span class="count">02</span></div>
+        <div class="chip-row"><span class="chip">TestNG</span><span class="chip">JUnit</span></div>
+      </div>
+      <div class="cov-cell">
+        <div class="cov-head"><h4>QA &amp; PM Tools</h4><span class="count">03</span></div>
+        <div class="chip-row"><span class="chip">Agile Accelerator</span><span class="chip">HP ALM</span><span class="chip">Postman</span></div>
+      </div>
+      <div class="cov-cell">
+        <div class="cov-head"><h4>Platforms</h4><span class="count">02</span></div>
+        <div class="chip-row"><span class="chip">Facets</span><span class="chip">Salesforce</span></div>
+      </div>
+      <div class="cov-cell">
+        <div class="cov-head"><h4>Database &amp; Domain</h4><span class="count">04</span></div>
+        <div class="chip-row"><span class="chip">SQL</span><span class="chip">Healthcare</span><span class="chip">Claims</span><span class="chip">EDI</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects" class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">What I'm Building</div>
+      <h2>Projects powered by AI</h2>
+      <p>A running log of things I've built by pairing with AI tools.</p>
+    </div>
+    <div class="proj-grid reveal">
+      <div class="proj-card">
+        <div>
+          <div class="mono">// flagship project</div>
+          <h3>Self-Healing Test Automation Framework</h3>
+          <p>An AI-assisted layer on top of Selenium/Playwright that automatically repairs broken UI locators when the application's front end changes — cutting down the manual maintenance burden that usually breaks automated suites after every release.</p>
+        </div>
+        <div class="tag-row"><span class="tag">Selenium</span><span class="tag">Playwright</span><span class="tag">AI-assisted</span></div>
+      </div>
+      <div class="proj-card pending">
+        <div>
+          <div class="mono">// awaiting details</div>
+          <h3>Project 02</h3>
+          <p>Slot reserved — send over the name, stack, and a short description and I'll drop it in here.</p>
+        </div>
+        <div class="tag-row"><span class="tag">TBD</span></div>
+      </div>
+      <div class="proj-card pending">
+        <div>
+          <div class="mono">// awaiting details</div>
+          <h3>Project 03</h3>
+          <p>Slot reserved — add as many project cards as you actually have; this grid scales cleanly.</p>
+        </div>
+        <div class="tag-row"><span class="tag">TBD</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section id="experience" class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">Professional Experience</div>
+      <h2>Career log</h2>
+      <p>Where I apply engineering rigor day to day — most recent first.</p>
+    </div>
+
+    <div class="timeline reveal">
+      <div class="entry">
+        <div class="entry-meta">
+          <span class="tag">current</span>
+          <span>Jun 2024 — Present</span>
+        </div>
+        <h3>Program Analyst — Automation Test Engineer</h3>
+        <div class="org">Cognizant Technology Solutions · Kolkata · Healthcare Domain</div>
+        <ul>
+          <li>Build and maintain automated test suites with Java-Selenium and Playwright, improving regression coverage for healthcare applications.</li>
+          <li>Bring GitHub Copilot, ChatGPT, and Claude into daily workflows to accelerate script generation, edge-case discovery, and defect root-cause analysis.</li>
+          <li>Test Facets and Salesforce for claims and policy management; validate EDI transactions and run API testing via Postman.</li>
+          <li>Active Agile team member across sprint planning, standups, and retrospectives.</li>
+        </ul>
+      </div>
+
+      <div class="entry">
+        <div class="entry-meta"><span>Dec 2023 — May 2024</span></div>
+        <h3>Intern — Software Test Engineer</h3>
+        <div class="org">Cognizant Technology Solutions · Coimbatore</div>
+        <ul>
+          <li>Gained hands-on experience in automation and manual testing for enterprise applications.</li>
+          <li>Collaborated with senior engineers on test strategy and execution.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACHIEVEMENTS -->
+  <section id="achievements" class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">Achievements &amp; Education</div>
+      <h2>Milestones</h2>
+    </div>
+    <div class="ach-list reveal">
+      <div class="ach">
+        <div class="mono">MERIT PROGRAM</div>
+        <h3>GenC Digital Honors</h3>
+        <p>Qualified for the Jr SDET role through Cognizant's merit-based GenC Digital Honors program — a competitive internal track recognizing technical excellence.</p>
+      </div>
+      <div class="ach">
+        <div class="mono">CERTIFICATION</div>
+        <h3>Playwright Automation Testing — Udemy</h3>
+        <p>Covered end-to-end browser automation, test architecture, and CI/CD integration.</p>
+      </div>
+      <div class="ach">
+        <div class="mono">EDUCATION</div>
+        <h3>B.Tech, Computer Science &amp; Engineering</h3>
+        <p>Guru Nanak Institute of Technology, West Bengal · 2019 – 2023</p>
+      </div>
+      <div class="ach">
+        <div class="mono">EDUCATION</div>
+        <h3>Higher Secondary Certificate — Science</h3>
+        <p>Harishchak High School, WBCHSE, West Bengal</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="wrap">
+    <div class="contact-card reveal">
+      <div>
+        <div class="eyebrow">Contact</div>
+        <h2>Let's build something.</h2>
+        <p>Open to conversations on AI-assisted engineering, automation, and anything built at the edge of the two. Reach out directly — I reply fast.</p>
+      </div>
+      <div class="contact-list">
+        <div class="row"><span>Email</span><a href="mailto:tapendupal122@gmail.com">tapendupal122@gmail.com</a></div>
+        <div class="row"><span>Phone</span><span>+91 90838 42869</span></div>
+        <div class="row"><span>LinkedIn</span><a href="https://www.linkedin.com/in/tapendu-pal-b23273224/" target="_blank" rel="noopener">/tapendu-pal-b23273224</a></div>
+        <div class="row"><span>Location</span><span>Hooghly, West Bengal</span></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Tapendu Pal</span>
+    <span>Built with intent, not templates.</span>
+  </div>
+</footer>
+
+</div><!-- /pageContent -->
+
+<button id="toTop" aria-label="Back to top">↑</button>
+
+<script src="script.js"></script>
+</body>
+</html>
