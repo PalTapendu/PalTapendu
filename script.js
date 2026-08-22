@@ -1,0 +1,667 @@
+const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ============================================================
+   0. Loader
+   ============================================================ */
+const loader = document.getElementById('loader');
+const loaderFill = document.getElementById('loaderFill');
+let loadPct = 0;
+const loadTimer = setInterval(() => {
+  loadPct += Math.random() * 18;
+  if (loadPct >= 100) {
+    loadPct = 100;
+    loaderFill.style.width = '100%';
+    clearInterval(loadTimer);
+    setTimeout(() => loader.classList.add('hide'), 250);
+  } else {
+    loaderFill.style.width = loadPct + '%';
+  }
+}, 120);
+
+/* ============================================================
+   1. Mouse-reactive multi-tint particle network + click ripples
+   ============================================================ */
+const canvas = document.getElementById('bgCanvas');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [], ripples = [];
+const mouse = { x: -9999, y: -9999, active: false };
+
+const PARTICLE_COLORS = [
+  'rgba(201, 162, 75, 0.85)',  // Gold
+  'rgba(0, 194, 168, 0.85)',   // Cyan
+  'rgba(116, 217, 174, 0.85)',  // Mint
+  'rgba(234, 237, 244, 0.75)',  // Silver
+  'rgba(139, 124, 240, 0.8)'   // Purple
+];
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  const density = Math.min(80, Math.floor((W * H) / 17000));
+  particles = Array.from({ length: density }, () => ({
+    x: Math.random() * W,
+    y: Math.random() * H,
+    vx: (Math.random() - 0.5) * 0.35,
+    vy: (Math.random() - 0.5) * 0.35,
+    r: Math.random() * 1.6 + 0.6,
+    color: PARTICLE_COLORS[Math.floor(Math.random() * PARTICLE_COLORS.length)]
+  }));
+}
+window.addEventListener('resize', resize);
+resize();
+
+window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; mouse.active = true; });
+window.addEventListener('mouseleave', () => { mouse.active = false; });
+window.addEventListener('touchmove', e => {
+  if (e.touches[0]) { mouse.x = e.touches[0].clientX; mouse.y = e.touches[0].clientY; mouse.active = true; }
+}, { passive: true });
+
+// Interactive shockwave ripple on click
+window.addEventListener('click', e => {
+  if (ripples.length < 8) {
+    ripples.push({ x: e.clientX, y: e.clientY, r: 2, maxR: 90, opacity: 0.55 });
+  }
+});
+
+const LINK_DIST = 120, MOUSE_DIST = 175;
+
+function tickCanvas() {
+  ctx.clearRect(0, 0, W, H);
+
+  // Render & update shockwave ripples
+  for (let k = ripples.length - 1; k >= 0; k--) {
+    const rip = ripples[k];
+    rip.r += 3.2;
+    rip.opacity *= 0.94;
+    if (rip.r >= rip.maxR || rip.opacity < 0.02) {
+      ripples.splice(k, 1);
+      continue;
+    }
+    ctx.beginPath();
+    ctx.arc(rip.x, rip.y, rip.r, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(201, 162, 75, ${rip.opacity})`;
+    ctx.lineWidth = 1.4;
+    ctx.stroke();
+  }
+
+  // Update particles
+  for (let p of particles) {
+    p.x += p.vx; p.y += p.vy;
+    if (p.x < 0 || p.x > W) p.vx *= -1;
+    if (p.y < 0 || p.y > H) p.vy *= -1;
+
+    // Repel or magnetize to mouse
+    if (mouse.active) {
+      const dx = p.x - mouse.x, dy = p.y - mouse.y, dist = Math.hypot(dx, dy);
+      if (dist < MOUSE_DIST && dist > 0) {
+        const f = (MOUSE_DIST - dist) / MOUSE_DIST;
+        p.x += (dx / dist) * f * 1.1;
+        p.y += (dy / dist) * f * 1.1;
+      }
+    }
+  }
+
+  // Draw connecting constellation lines
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const a = particles[i], b = particles[j];
+      const dx = a.x - b.x, dy = a.y - b.y, dist = Math.hypot(dx, dy);
+      if (dist < LINK_DIST) {
+        ctx.strokeStyle = `rgba(139,147,169,${0.12 * (1 - dist / LINK_DIST)})`;
+        ctx.lineWidth = 0.85;
+        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+      }
+    }
+    if (mouse.active) {
+      const a = particles[i];
+      const dx = a.x - mouse.x, dy = a.y - mouse.y, dist = Math.hypot(dx, dy);
+      if (dist < MOUSE_DIST) {
+        ctx.strokeStyle = `rgba(201,162,75,${0.28 * (1 - dist / MOUSE_DIST)})`;
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(mouse.x, mouse.y); ctx.stroke();
+      }
+    }
+  }
+
+  // Draw particle nodes
+  for (let p of particles) {
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = p.color;
+    ctx.shadowBlur = 4;
+    ctx.shadowColor = p.color;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+
+  if (!prefersReduced) requestAnimationFrame(tickCanvas);
+}
+if (prefersReduced) { ctx.fillStyle = '#0A0F1C'; ctx.fillRect(0, 0, W, H); }
+else { requestAnimationFrame(tickCanvas); }
+
+/* ============================================================
+   2. Aurora blobs — parallax drift with mouse + slow float
+   ============================================================ */
+const blobs = document.querySelectorAll('.blob');
+const blobFactors = [0.018, -0.024, 0.02];
+let bt = 0;
+function blobLoop() {
+  bt += 0.004;
+  blobs.forEach((b, i) => {
+    const floatX = Math.sin(bt + i * 2) * 26;
+    const floatY = Math.cos(bt * 0.8 + i * 2) * 26;
+    const parX = (mouse.x - innerWidth / 2 || 0) * blobFactors[i];
+    const parY = (mouse.y - innerHeight / 2 || 0) * blobFactors[i];
+    b.style.transform = `translate(${floatX + parX}px, ${floatY + parY}px)`;
+  });
+  if (!prefersReduced) requestAnimationFrame(blobLoop);
+}
+blobLoop();
+
+/* ============================================================
+   3. Kinetic hero headline entrance & interactive glint
+   ============================================================ */
+const heroBadge = document.querySelector('.hero-badge');
+if (heroBadge) {
+  heroBadge.style.opacity = '0';
+  heroBadge.style.transform = 'translateY(12px)';
+  heroBadge.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+  setTimeout(() => {
+    heroBadge.style.opacity = '1';
+    heroBadge.style.transform = 'translateY(0)';
+  }, 300);
+}
+
+const heroHeadline = document.getElementById('heroHeadline');
+if (heroHeadline) {
+  const line1 = heroHeadline.querySelector('.hero-line-1');
+  const line2 = heroHeadline.querySelector('.hero-line-2');
+  if (line1) {
+    line1.style.opacity = '0';
+    line1.style.transform = 'translateY(18px)';
+    line1.style.transition = 'opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)';
+    setTimeout(() => {
+      line1.style.opacity = '1';
+      line1.style.transform = 'translateY(0)';
+    }, 450);
+  }
+  if (line2) {
+    line2.style.opacity = '0';
+    line2.style.transform = 'translateY(18px)';
+    line2.style.transition = 'opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)';
+    setTimeout(() => {
+      line2.style.opacity = '1';
+      line2.style.transform = 'translateY(0)';
+    }, 600);
+  }
+}
+
+/* ============================================================
+   4. Re-triggering terminal typing animation
+   ============================================================ */
+const assertions = [
+  "booting autonomous profile...",
+  ["Engineer with 2.5+ years building & testing software at scale"],
+  ["Daily AI stack: GitHub Copilot, ChatGPT, Claude 3.7"],
+  ["Core expertise: Selenium, Playwright, Enterprise Automation"],
+  ["Currently shipping personal AI-powered full-stack projects"],
+  ["Status: online, caffeinated, building 🚀"]
+];
+const consoleBody = document.getElementById('consoleBody');
+const consoleBox = document.getElementById('consoleBox');
+let consoleRunId = 0;
+
+function typeLine(text, isAssertion, cb, runId) {
+  const line = document.createElement('div');
+  line.className = 'console-line';
+  const mark = document.createElement('span');
+  mark.className = 'mark';
+  mark.textContent = isAssertion ? '…' : '$';
+  const txt = document.createElement('span');
+  line.appendChild(mark); line.appendChild(txt);
+  consoleBody.appendChild(line);
+  requestAnimationFrame(() => { if (runId === consoleRunId) line.style.transition = 'opacity .3s ease'; });
+  line.style.opacity = 1;
+  let i = 0; const speed = 16;
+  function step() {
+    if (runId !== consoleRunId) return;
+    if (i <= text.length) { txt.textContent = text.slice(0, i); i++; setTimeout(step, speed); }
+    else {
+      if (isAssertion) { line.classList.add('passed'); mark.textContent = '✓'; }
+      if (cb) setTimeout(() => { if (runId === consoleRunId) cb(); }, 160);
+    }
+  }
+  step();
+}
+function runConsoleSuite() {
+  consoleRunId++;
+  const runId = consoleRunId;
+  consoleBody.innerHTML = '';
+  let i = 0;
+  function next() {
+    if (runId !== consoleRunId) return;
+    if (i >= assertions.length) {
+      const summary = document.createElement('div');
+      summary.className = 'console-summary';
+      summary.innerHTML = '5 passed, 0 failed <span class="cursor-blink"></span>';
+      consoleBody.appendChild(summary);
+      requestAnimationFrame(() => {
+        if (runId !== consoleRunId) return;
+        summary.style.transition = 'opacity .5s ease';
+        summary.style.opacity = 1;
+      });
+      return;
+    }
+    const item = assertions[i];
+    const isAssertion = Array.isArray(item);
+    typeLine(isAssertion ? item[0] : item, isAssertion, () => {
+      i++; setTimeout(() => { if (runId === consoleRunId) next(); }, 120);
+    }, runId);
+  }
+  next();
+}
+new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) runConsoleSuite(); });
+}, { threshold: 0.45 }).observe(consoleBox);
+
+/* ============================================================
+   5. Animated stat counters (Integers & Floats)
+   ============================================================ */
+document.querySelectorAll('[data-count], [data-count-float]').forEach(el => {
+  const isFloat = el.hasAttribute('data-count-float');
+  const target = isFloat
+    ? parseFloat(el.getAttribute('data-count-float'))
+    : parseInt(el.getAttribute('data-count'), 10);
+
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        let start = null;
+        const duration = 1100;
+        function step(ts) {
+          if (!start) start = ts;
+          const p = Math.min((ts - start) / duration, 1);
+          const easeOut = 1 - Math.pow(1 - p, 3); // Cubic ease out
+          const current = easeOut * target;
+          el.textContent = isFloat ? current.toFixed(1) : Math.floor(current);
+          if (p < 1) requestAnimationFrame(step);
+          else el.textContent = isFloat ? target.toFixed(1) : target;
+        }
+        requestAnimationFrame(step);
+      } else {
+        el.textContent = isFloat ? '0.0' : '0';
+      }
+    });
+  }, { threshold: 0.5 });
+  io.observe(el);
+});
+
+/* ============================================================
+   6. Scroll progress + back to top
+   ============================================================ */
+const progress = document.getElementById('scrollProgress');
+const toTop = document.getElementById('toTop');
+document.addEventListener('scroll', () => {
+  const h = document.documentElement;
+  progress.style.width = (h.scrollTop / (h.scrollHeight - h.clientHeight) * 100) + '%';
+  toTop.classList.toggle('show', h.scrollTop > 600);
+}, { passive: true });
+toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+/* ============================================================
+   7. Two-way scroll reveal
+   ============================================================ */
+let lastY = window.scrollY, dir = 'down';
+window.addEventListener('scroll', () => {
+  const y = window.scrollY;
+  dir = y > lastY ? 'down' : (y < lastY ? 'up' : dir);
+  lastY = y;
+}, { passive: true });
+const revealIO = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    const el = entry.target;
+    if (entry.isIntersecting) {
+      el.classList.toggle('reveal-up', dir === 'up');
+      void el.offsetWidth;
+      el.classList.add('in');
+    } else {
+      el.classList.remove('in');
+    }
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.reveal').forEach(el => revealIO.observe(el));
+
+/* ============================================================
+   8. 3D Tilt & Spotlight-glow cursor tracking on cards
+   ============================================================ */
+document.querySelectorAll('.glow-card').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const r = card.getBoundingClientRect();
+    const x = e.clientX - r.left;
+    const y = e.clientY - r.top;
+    card.style.setProperty('--mx', (x / r.width * 100) + '%');
+    card.style.setProperty('--my', (y / r.height * 100) + '%');
+
+    // Subtle 3D perspective tilt
+    const centerX = r.width / 2;
+    const centerY = r.height / 2;
+    const rotX = ((y - centerY) / centerY) * -3.8;
+    const rotY = ((x - centerX) / centerX) * 3.8;
+    card.style.transform = `perspective(1000px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateY(-2px)`;
+  });
+
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
+  });
+});
+
+/* ============================================================
+   8b. Interactive Spotlight Torch Tracking on Section Titles
+   ============================================================ */
+const torchTitles = document.querySelectorAll('.section-head h2, .contact-card h2');
+
+function updateTorchPositions(e) {
+  const mouseX = e.clientX;
+  const mouseY = e.clientY;
+
+  torchTitles.forEach(title => {
+    const rect = title.getBoundingClientRect();
+    if (rect.bottom >= -50 && rect.top <= window.innerHeight + 50) {
+      const relX = mouseX - rect.left;
+      const relY = mouseY - rect.top;
+      title.style.setProperty('--hx', `${relX.toFixed(1)}px`);
+      title.style.setProperty('--hy', `${relY.toFixed(1)}px`);
+    }
+  });
+}
+
+window.addEventListener('mousemove', updateTorchPositions, { passive: true });
+window.addEventListener('touchmove', e => {
+  if (e.touches[0]) updateTorchPositions(e.touches[0]);
+}, { passive: true });
+
+// Initial gentle sweep animation on viewport entrance
+const torchIO = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const title = entry.target;
+      const rect = title.getBoundingClientRect();
+      let sweepX = -120;
+      const maxSweep = rect.width + 120;
+      function introSweep() {
+        sweepX += (maxSweep - sweepX) * 0.07;
+        title.style.setProperty('--hx', `${sweepX.toFixed(1)}px`);
+        title.style.setProperty('--hy', `${(rect.height / 2).toFixed(1)}px`);
+        if (sweepX < maxSweep - 4) {
+          requestAnimationFrame(introSweep);
+        }
+      }
+      introSweep();
+    }
+  });
+}, { threshold: 0.3 });
+
+torchTitles.forEach(h => torchIO.observe(h));
+
+/* ============================================================
+   9. Fluid Magnetic buttons/links with spring physics
+   ============================================================ */
+document.querySelectorAll('.magnetic, .btn-primary, .btn-ghost, .navcta').forEach(el => {
+  el.addEventListener('mousemove', e => {
+    const r = el.getBoundingClientRect();
+    const relX = e.clientX - r.left - r.width / 2;
+    const relY = e.clientY - r.top - r.height / 2;
+    el.style.transform = `translate(${relX * 0.22}px, ${relY * 0.28}px) scale(1.03)`;
+  });
+  el.addEventListener('mouseleave', () => {
+    el.style.transform = 'translate(0,0) scale(1)';
+  });
+});
+
+/* ============================================================
+   10. Scrollspy nav
+   ============================================================ */
+const sections = ['about', 'skills', 'projects', 'experience', 'contact'].map(id => document.getElementById(id));
+const navA = document.querySelectorAll('.navlinks a');
+const spy = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) navA.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + entry.target.id));
+  });
+}, { rootMargin: '-40% 0px -50% 0px' });
+sections.forEach(s => s && spy.observe(s));
+
+/* ============================================================
+   11. Project modal
+   ============================================================ */
+const overlay = document.getElementById('modalOverlay');
+const modalClose = document.getElementById('modalClose');
+document.querySelectorAll('.proj-card[data-modal]').forEach(card => {
+  card.addEventListener('click', () => overlay.classList.add('show'));
+});
+function closeModal() { overlay.classList.remove('show'); }
+modalClose.addEventListener('click', closeModal);
+overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+/* ============================================================
+   12. Blur-in reveal for skills big-tile lines (distinct from
+       the hero terminal typing effect) — staggered, two-way
+   ============================================================ */
+const blurLines = document.querySelectorAll('.blur-line');
+const aiTile = document.getElementById('aiTile');
+if (aiTile && blurLines.length) {
+  const blurIO = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        blurLines.forEach((line, i) => setTimeout(() => line.classList.add('in'), i * 160));
+      } else {
+        blurLines.forEach(line => line.classList.remove('in'));
+      }
+    });
+  }, { threshold: 0.4 });
+  blurIO.observe(aiTile);
+}
+
+/* ============================================================
+   13. Interactive coder illustration
+       - Single seated developer at his workstation
+       - Idle State: Head facing screen (#headCoding), typing away with code streaming
+       - Active Cursor: Head turns forward (#headTurned), typing pauses, both eyes track cursor in real time
+       - Inactivity Timeout (~2.4s stationary cursor in card):
+         Pops up "Please, let me do my work!", turns head back to screen, and resumes coding!
+       - Moving Cursor Again: Resumes watching the cursor
+       - Click: Angry shake & speech reaction
+   ============================================================ */
+const illusTile = document.getElementById('illusTile');
+const headTurned = document.getElementById('headTurned');
+const pupilLeft = document.getElementById('pupilLeft');
+const pupilRight = document.getElementById('pupilRight');
+const speechText = document.getElementById('speechText');
+const statusLabel = document.getElementById('statusLabel');
+
+const angryReactions = [
+  "Please let me finish my work!",
+  "Hey! Let me finish my code!",
+  "404: Focus interrupted! Let me work!",
+  "I'm in the zone, stop clicking!",
+  "Please, let's finish my work!"
+];
+
+const idleReactions = [
+  "Please, let me do my work!",
+  "Are you going to let me code?",
+  "Still there? Let me finish my work!",
+  "Back to writing code..."
+];
+
+let angryTimer = null;
+let idleTimer = null;
+let bubbleHideTimer = null;
+let isHovered = false;
+
+// Real-time tracking coordinates & lerp variables
+let targetPupilX = 0, targetPupilY = 0;
+let currPupilX = 0, currPupilY = 0;
+let targetHeadX = 0, targetHeadY = 0, targetHeadRot = 0;
+let currHeadX = 0, currHeadY = 0, currHeadRot = 0;
+let trackingRafId = null;
+
+function animateTracking() {
+  currPupilX += (targetPupilX - currPupilX) * 0.35;
+  currPupilY += (targetPupilY - currPupilY) * 0.35;
+  currHeadX += (targetHeadX - currHeadX) * 0.30;
+  currHeadY += (targetHeadY - currHeadY) * 0.30;
+  currHeadRot += (targetHeadRot - currHeadRot) * 0.30;
+
+  if (pupilLeft && pupilRight) {
+    const pTransform = `translate(${currPupilX.toFixed(2)}px, ${currPupilY.toFixed(2)}px)`;
+    pupilLeft.style.transform = pTransform;
+    pupilRight.style.transform = pTransform;
+  }
+
+  if (headTurned) {
+    headTurned.style.transform = `translate(${currHeadX.toFixed(2)}px, ${currHeadY.toFixed(2)}px) rotate(${currHeadRot.toFixed(2)}deg)`;
+  }
+
+  const isStillMoving =
+    Math.abs(targetPupilX - currPupilX) > 0.02 ||
+    Math.abs(targetPupilY - currPupilY) > 0.02 ||
+    Math.abs(targetHeadX - currHeadX) > 0.02 ||
+    Math.abs(targetHeadRot - currHeadRot) > 0.02;
+
+  if (isHovered || isStillMoving) {
+    trackingRafId = requestAnimationFrame(animateTracking);
+  } else {
+    trackingRafId = null;
+  }
+}
+
+function startTrackingLoop() {
+  if (!trackingRafId) {
+    trackingRafId = requestAnimationFrame(animateTracking);
+  }
+}
+
+// Fired when cursor stays motionless inside the card for 2.4s
+function onInactivityTimeout() {
+  if (!isHovered || illusTile.classList.contains('is-angry')) return;
+
+  const chosenLine = idleReactions[Math.floor(Math.random() * idleReactions.length)];
+  speechText.textContent = chosenLine;
+  illusTile.classList.add('show-bubble');
+
+  // Turn head back to laptop and resume coding
+  illusTile.classList.remove('is-watching');
+  if (statusLabel) statusLabel.textContent = `// status: "${chosenLine}" — resumed coding`;
+
+  // Hide the bubble after 2.5s while he keeps coding
+  clearTimeout(bubbleHideTimer);
+  bubbleHideTimer = setTimeout(() => {
+    illusTile.classList.remove('show-bubble');
+  }, 2500);
+}
+
+function triggerAngryReaction() {
+  if (!illusTile || !speechText) return;
+  clearTimeout(angryTimer);
+  clearTimeout(idleTimer);
+  clearTimeout(bubbleHideTimer);
+
+  const chosenReaction = angryReactions[Math.floor(Math.random() * angryReactions.length)];
+  speechText.textContent = chosenReaction;
+  illusTile.classList.remove('show-bubble');
+  illusTile.classList.add('is-angry', 'is-watching');
+  if (statusLabel) statusLabel.textContent = "ANGRY // interrupted!";
+
+  angryTimer = setTimeout(() => {
+    illusTile.classList.remove('is-angry');
+    if (isHovered) {
+      if (statusLabel) statusLabel.textContent = "watching your cursor 👀";
+      // Restart inactivity timer
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(onInactivityTimeout, 2400);
+    } else {
+      illusTile.classList.remove('is-watching');
+      if (statusLabel) statusLabel.textContent = "focus mode — coding...";
+    }
+  }, 2200);
+}
+
+if (illusTile) {
+  illusTile.addEventListener('mouseenter', () => {
+    isHovered = true;
+    if (!illusTile.classList.contains('is-angry')) {
+      illusTile.classList.add('is-watching');
+      illusTile.classList.remove('show-bubble');
+      if (statusLabel) statusLabel.textContent = "watching your cursor 👀";
+    }
+    startTrackingLoop();
+  });
+
+  illusTile.addEventListener('mousemove', e => {
+    isHovered = true;
+    clearTimeout(bubbleHideTimer);
+
+    // If we were in idle-resumed-coding state, dismiss bubble and turn head back to watch cursor
+    if (!illusTile.classList.contains('is-angry')) {
+      illusTile.classList.remove('show-bubble');
+      illusTile.classList.add('is-watching');
+      if (statusLabel) statusLabel.textContent = "watching your cursor 👀";
+    }
+
+    const r = illusTile.getBoundingClientRect();
+    // Head center in relative coords (~30.8% X, ~31.5% Y)
+    const faceX = r.left + r.width * 0.308;
+    const faceY = r.top + r.height * 0.315;
+
+    const dx = e.clientX - faceX;
+    const dy = e.clientY - faceY;
+    const angle = Math.atan2(dy, dx);
+    const distRatio = Math.min(1, Math.hypot(dx, dy) / (r.width * 0.44));
+
+    // Pupils offset calculation within eye whites
+    targetPupilX = Math.cos(angle) * distRatio * 3.4;
+    targetPupilY = Math.sin(angle) * distRatio * 2.5;
+
+    // Head tilt & rotation
+    targetHeadX = Math.cos(angle) * distRatio * 2.4;
+    targetHeadY = Math.sin(angle) * distRatio * 1.8;
+    targetHeadRot = Math.max(-6, Math.min(6, (dx / (r.width * 0.5)) * 5));
+
+    startTrackingLoop();
+
+    // Reset inactivity timer on every mouse move
+    clearTimeout(idleTimer);
+    if (!illusTile.classList.contains('is-angry')) {
+      idleTimer = setTimeout(onInactivityTimeout, 2400);
+    }
+  });
+
+  illusTile.addEventListener('mouseleave', () => {
+    isHovered = false;
+    clearTimeout(idleTimer);
+    clearTimeout(bubbleHideTimer);
+
+    illusTile.classList.remove('is-watching', 'show-bubble');
+
+    // Return head and pupils to neutral
+    targetPupilX = 0;
+    targetPupilY = 0;
+    targetHeadX = 0;
+    targetHeadY = 0;
+    targetHeadRot = 0;
+
+    startTrackingLoop();
+
+    if (!illusTile.classList.contains('is-angry') && statusLabel) {
+      statusLabel.textContent = "focus mode — coding...";
+    }
+  });
+
+  illusTile.addEventListener('click', triggerAngryReaction);
+  illusTile.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      triggerAngryReaction();
+    }
+  });
+}

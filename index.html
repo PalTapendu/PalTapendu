@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tapendu Pal — Apex</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- LOADER -->
+  <div id="loader">
+    <div class="loader-mark mono">TP<span>.</span></div>
+    <div class="loader-bar">
+      <div class="loader-fill" id="loaderFill"></div>
+    </div>
+  </div>
+
+  <canvas id="bgCanvas"></canvas>
+  <div id="blobField">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+  <div id="scrollProgress"></div>
+
+  <div id="pageContent">
+
+    <header>
+      <div class="wrap">
+        <nav>
+          <div class="logo">TP<span>.</span></div>
+          <div class="navlinks">
+            <a href="#about">About</a>
+            <a href="#skills">Skills</a>
+            <a href="#projects">Projects</a>
+            <a href="#experience">Experience</a>
+            <a href="#contact">Contact</a>
+          </div>
+          <a class="navcta magnetic" href="https://github.com/PalTapendu" target="_blank" rel="noopener"><span
+              class="bracket bracket-l">&lt;</span><span>GitHub</span><span class="bracket bracket-r">/&gt;</span></a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <!-- HERO -->
+      <section class="hero wrap">
+        <div class="hero-content">
+          <!-- Futuristic Live AI Beacon Badge -->
+          <div class="hero-badge">
+            <span class="pulse-beacon"><span class="beacon-ring"></span><span class="beacon-dot"></span></span>
+            <span class="badge-text">APPLIED AI &middot; AUTOMATION ARCHITECT</span>
+            <span class="badge-tag">AI-NATIVE</span>
+          </div>
+
+          <h1 id="heroHeadline" class="futuristic-headline">
+            <span class="hero-line hero-line-1"><span class="hero-subtext">I build with</span> <span class="ai-highlight">AI.</span></span>
+            <span class="hero-line hero-line-2"><em>Every single day.</em></span>
+          </h1>
+
+          <p class="lede">I'm <strong>Tapendu Pal</strong> — an engineer who lives at the intersection of software engineering and applied AI. I use tools like GitHub Copilot, ChatGPT, and Claude to design, prototype, and ship automated enterprise systems.</p>
+
+          <div class="hero-ctas">
+            <a href="#projects" class="btn btn-primary magnetic"><span class="bracket bracket-l">&lt;</span><span>See what I'm building</span><span class="bracket bracket-r">/&gt;</span></a>
+            <a href="#contact" class="btn btn-ghost magnetic"><span class="bracket bracket-l">&lt;</span><span>Contact me</span><span class="bracket bracket-r">/&gt;</span></a>
+          </div>
+        </div>
+
+        <!-- Futuristic HUD Terminal Console -->
+        <div class="console glow-card glass" id="consoleBox" role="img" aria-label="Terminal animation showing a passing status log">
+          <div class="console-bar">
+            <div class="console-controls">
+              <span class="dot" style="background:#FF5F56"></span>
+              <span class="dot" style="background:#FFBD2E"></span>
+              <span class="dot" style="background:#27C93F"></span>
+            </div>
+            <span class="console-title">whoami.log</span>
+            <div class="console-hud-meta">
+              <span class="hud-item"><span class="hud-live-dot"></span>SYS: OK</span>
+              <span class="hud-item hud-latency">12ms</span>
+            </div>
+          </div>
+          <div class="console-body" id="consoleBody"></div>
+        </div>
+      </section>
+
+      <!-- STATUS BAR -->
+      <div class="statusbar reveal">
+        <div class="wrap">
+          <div class="stat">
+            <div class="num"><span data-count-float="2.5">0.0</span>+ Yrs</div>
+            <div class="label">// SDET @ Cognizant — delivering projects</div>
+          </div>
+          <div class="stat">
+            <div class="num"><span data-count="3">0</span>+ AI Tools</div>
+            <div class="label">// used in daily work &amp; building projects</div>
+          </div>
+          <div class="stat">
+            <div class="num"><span data-count="1">0</span> live</div>
+            <div class="label">// ai-built project</div>
+          </div>
+          <div class="stat">
+            <div class="num">B.Tech</div>
+            <div class="label">// computer science</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ABOUT — bento -->
+      <section id="about" class="wrap">
+        <div class="section-head reveal">
+          <h2>Engineer first. AI-native by choice.</h2>
+        </div>
+        <div class="bento reveal">
+          <div class="glow-card glass">
+            <p>Tech has always been the thing I gravitate to — not just as a job, but as a hobby. Somewhere in the last
+              couple of years, AI stopped being a buzzword for me and became a daily working tool: I prompt, iterate,
+              and build with it the way other people reach for a text editor.</p>
+            <p>I spend my free time experimenting with <strong>AI-assisted development</strong> — turning ideas into
+              working projects and exploring <strong>prompt engineering</strong>. Professionally, I bring the same
+              mindset into enterprise software engineering, building and validating systems at scale.</p>
+          </div>
+          <div class="glow-card glass illustration-tile" id="illusTile" role="button" tabindex="0"
+            aria-label="Interactive developer workstation — move your cursor around, or click to interact">
+
+            <!-- Left-side Ambient Infinite Scrolling Code Stream -->
+            <div class="code-stream-backdrop left-stream" aria-hidden="true">
+              <div class="code-stream-track">
+                <!-- Group 1 -->
+                <div class="code-block">
+                  <span>pstmtInsert.setObject(1, columnValue);</span>
+                  <span>ResultSetMetaData rsmd = rs.getMetaData();</span>
+                  <span>for (int i = 0; i &lt; col_size; i++) {</span>
+                  <span> columnValue = rsdata.getObject(i + 1);</span>
+                  <span> pstmtInsert.executeUpdate();</span>
+                  <span>}</span>
+                  <span>conRenameInfo.prepareStatement("INSERT INTO table...");</span>
+                  <span>String dbUrl = "jdbc:oracle:thin:@localhost:1521:xe";</span>
+                  <span>rsmd.getColumnTypeName(i) + "\t|\t" + value;</span>
+                  <span>Class.forName("com.mysql.cj.jdbc.Driver");</span>
+                  <span>Connection conn = DriverManager.getConnection(url);</span>
+                  <span>PreparedStatement ps = conn.prepareStatement(sql);</span>
+                  <span>ps.setString(1, claimsId);</span>
+                  <span>ps.setDouble(2, calculatedAmount);</span>
+                  <span>ps.addBatch();</span>
+                  <span>int[] results = ps.executeBatch();</span>
+                  <span>while (rsdata.next()) {</span>
+                  <span> driver.findElement(By.id("btn-submit")).click();</span>
+                  <span> page.locator(".claims-form").fill(value);</span>
+                  <span> assertThat(response.status()).isEqualTo(200);</span>
+                  <span>}</span>
+                  <span>const locator = await repairBrokenSelector(dom);</span>
+                  <span>testContext.log("// EDI 837 transaction passed");</span>
+                  <span>await playwright.chromium.launch({ headless: true });</span>
+                </div>
+                <!-- Group 2 (Exact duplicate for 100% seamless, uninterrupted loop) -->
+                <div class="code-block">
+                  <span>pstmtInsert.setObject(1, columnValue);</span>
+                  <span>ResultSetMetaData rsmd = rs.getMetaData();</span>
+                  <span>for (int i = 0; i &lt; col_size; i++) {</span>
+                  <span> columnValue = rsdata.getObject(i + 1);</span>
+                  <span> pstmtInsert.executeUpdate();</span>
+                  <span>}</span>
+                  <span>conRenameInfo.prepareStatement("INSERT INTO table...");</span>
+                  <span>String dbUrl = "jdbc:oracle:thin:@localhost:1521:xe";</span>
+                  <span>rsmd.getColumnTypeName(i) + "\t|\t" + value;</span>
+                  <span>Class.forName("com.mysql.cj.jdbc.Driver");</span>
+                  <span>Connection conn = DriverManager.getConnection(url);</span>
+                  <span>PreparedStatement ps = conn.prepareStatement(sql);</span>
+                  <span>ps.setString(1, claimsId);</span>
+                  <span>ps.setDouble(2, calculatedAmount);</span>
+                  <span>ps.addBatch();</span>
+                  <span>int[] results = ps.executeBatch();</span>
+                  <span>while (rsdata.next()) {</span>
+                  <span> driver.findElement(By.id("btn-submit")).click();</span>
+                  <span> page.locator(".claims-form").fill(value);</span>
+                  <span> assertThat(response.status()).isEqualTo(200);</span>
+                  <span>}</span>
+                  <span>const locator = await repairBrokenSelector(dom);</span>
+                  <span>testContext.log("// EDI 837 transaction passed");</span>
+                  <span>await playwright.chromium.launch({ headless: true });</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="speech-bubble-html" id="speechBubble"><span id="speechText">Please, let me do my work!</span>
+            </div>
+
+            <svg class="coder-illustration" id="coderIllus" viewBox="0 0 360 260" xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true">
+              <defs>
+                <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#24345A" />
+                  <stop offset="60%" stop-color="#141E36" />
+                  <stop offset="100%" stop-color="#0B1020" />
+                </linearGradient>
+                <linearGradient id="pantsGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#1A243C" />
+                  <stop offset="100%" stop-color="#0C1220" />
+                </linearGradient>
+                <linearGradient id="skinGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#FFE8D8" />
+                  <stop offset="100%" stop-color="#F2C2A0" />
+                </linearGradient>
+                <linearGradient id="hairGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#283756" />
+                  <stop offset="50%" stop-color="#162034" />
+                  <stop offset="100%" stop-color="#0A0E18" />
+                </linearGradient>
+                <linearGradient id="chairGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#121B32" />
+                  <stop offset="100%" stop-color="#080D1A" />
+                </linearGradient>
+                <linearGradient id="deskRimGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#C9A24B" stop-opacity="0.35" />
+                  <stop offset="50%" stop-color="#00C2A8" stop-opacity="0.25" />
+                  <stop offset="100%" stop-color="#8B7CF0" stop-opacity="0.1" />
+                </linearGradient>
+                <linearGradient id="screenGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#0C1428" />
+                  <stop offset="100%" stop-color="#040710" />
+                </linearGradient>
+                <linearGradient id="irisGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#00C2A8" />
+                  <stop offset="50%" stop-color="#1A4A62" />
+                  <stop offset="100%" stop-color="#080F1D" />
+                </linearGradient>
+              </defs>
+
+              <!-- Ambient Floor Shadow -->
+              <ellipse cx="180" cy="242" rx="160" ry="12" fill="rgba(0,0,0,0.42)" />
+
+              <!-- Full Ergonomic Office Chair (Behind) -->
+              <g class="dev-chair">
+                <!-- Headrest -->
+                <rect x="64" y="44" width="22" height="18" rx="6" fill="url(#chairGrad)" stroke="rgba(234,237,244,0.16)"
+                  stroke-width="1.2" />
+                <path d="M75 62 L75 70" stroke="#080D1A" stroke-width="3" />
+
+                <!-- Backrest Spine & Curved Cushion -->
+                <path d="M60 70 Q52 120 66 168 Q84 170 82 168 Q70 120 76 70 Z" fill="url(#chairGrad)"
+                  stroke="rgba(234,237,244,0.14)" stroke-width="1.5" />
+
+                <!-- Seat Cushion (Where character is seated) -->
+                <rect x="68" y="166" width="76" height="14" rx="4" fill="#141F38" stroke="rgba(234,237,244,0.15)"
+                  stroke-width="1.2" />
+
+                <!-- Armrest -->
+                <path d="M68 128 L68 150 L94 150" stroke="#0A0F1E" stroke-width="3.5" stroke-linecap="round"
+                  stroke-linejoin="round" fill="none" />
+                <rect x="64" y="125" width="34" height="4.5" rx="2" fill="#1A2846" />
+
+                <!-- Gas Lift Cylinder -->
+                <rect x="101" y="180" width="8" height="36" rx="2" fill="#080D1A" stroke="rgba(234,237,244,0.1)"
+                  stroke-width="1" />
+                <rect x="99" y="214" width="12" height="6" rx="2" fill="#16223C" />
+
+                <!-- 5-Star Chair Base with Wheels -->
+                <path d="M105 218 L62 235 M105 218 L105 238 M105 218 L148 235" stroke="#0C1426" stroke-width="4.5"
+                  stroke-linecap="round" />
+                <circle cx="60" cy="236" r="3.5" fill="#1A2846" />
+                <circle cx="105" cy="239" r="3.5" fill="#1A2846" />
+                <circle cx="150" cy="236" r="3.5" fill="#1A2846" />
+              </g>
+
+              <!-- Modern Workstation Desk (Right Side) -->
+              <g class="dev-desk">
+                <!-- Desk Leg (Right) -->
+                <rect x="318" y="162" width="7" height="76" rx="2" fill="#090E1C" />
+                <rect x="312" y="236" width="18" height="4" rx="1.5" fill="#060A14" />
+
+                <!-- RGB Desktop Edge Glow -->
+                <line x1="172" y1="160" x2="336" y2="160" stroke="url(#deskRimGlow)" stroke-width="6"
+                  stroke-linecap="round" />
+
+                <!-- Desktop Surface -->
+                <path d="M168 158 L338 158 L324 168 L178 168 Z" fill="#111B32" stroke="rgba(234,237,244,0.16)"
+                  stroke-width="1.4" />
+                <rect x="178" y="167" width="146" height="3" fill="#060A14" />
+
+                <!-- Dev Coffee Mug with subtle steam -->
+                <g class="dev-coffee">
+                  <rect x="290" y="138" width="15" height="19" rx="3.5" fill="#16223C" stroke="#C9A24B"
+                    stroke-width="1.2" />
+                  <path d="M305 142 C310 142, 310 152, 305 152" stroke="#C9A24B" stroke-width="1.4" fill="none"
+                    stroke-linecap="round" />
+                  <path class="steam-line steam-1" d="M294 131 Q297 126 294 120" stroke="rgba(201,162,75,0.6)"
+                    stroke-width="1.2" fill="none" stroke-linecap="round" />
+                  <path class="steam-line steam-2" d="M299 132 Q302 125 299 118" stroke="rgba(201,162,75,0.4)"
+                    stroke-width="1.2" fill="none" stroke-linecap="round" />
+                </g>
+              </g>
+
+              <!-- Slim Laptop Setup -->
+              <g class="dev-laptop" id="devLaptop">
+                <!-- Laptop Base & Backlit Keyboard Deck -->
+                <polygon points="188,157 266,157 258,165 194,165" fill="#17243E" stroke="rgba(234,237,244,0.2)"
+                  stroke-width="1.2" />
+                <rect x="214" y="160" width="22" height="3.5" rx="1.2" fill="#080D1A" />
+                <line x1="198" y1="159" x2="254" y2="159" stroke="rgba(116,217,174,0.35)" stroke-width="1"
+                  stroke-dasharray="2 1.5" />
+
+                <!-- Screen Display Matrix -->
+                <rect x="198" y="94" width="76" height="64" rx="5" fill="#0C1428" stroke="rgba(234,237,244,0.22)"
+                  stroke-width="1.4" />
+                <rect x="201" y="97" width="70" height="58" rx="3" fill="url(#screenGrad)" />
+
+                <!-- IDE Window Bar -->
+                <circle cx="207" cy="102" r="1.5" fill="#FF6B9D" />
+                <circle cx="212" cy="102" r="1.5" fill="#E3B341" />
+                <circle cx="217" cy="102" r="1.5" fill="#74D9AE" />
+                <line x1="201" y1="106" x2="271" y2="106" stroke="rgba(234,237,244,0.08)" stroke-width="1" />
+
+                <!-- Streaming Code Lines -->
+                <g class="screen-code-group" id="screenCodeGroup">
+                  <rect class="code-line cl-1" x="206" y="111" height="2.8" rx="1.4" fill="#74D9AE" />
+                  <rect class="code-line cl-2" x="206" y="117" height="2.8" rx="1.4" fill="#C9A24B" />
+                  <rect class="code-line cl-3" x="213" y="123" height="2.8" rx="1.4" fill="#8B7CF0" />
+                  <rect class="code-line cl-4" x="213" y="129" height="2.8" rx="1.4" fill="#00C2A8" />
+                  <rect class="code-line cl-5" x="206" y="135" height="2.8" rx="1.4" fill="#FF6B9D" />
+                  <rect class="code-line cl-6" x="213" y="141" height="2.8" rx="1.4" fill="#74D9AE" />
+                  <rect class="code-line cl-7" x="206" y="147" height="2.8" rx="1.4" fill="#C9A24B" />
+                  <rect class="code-cursor-blink" x="238" y="147" width="2.8" height="3" fill="#E7CD8E" />
+                </g>
+
+                <!-- Paused Overlay -->
+                <g class="screen-paused-state" id="screenPausedState">
+                  <rect x="204" y="110" width="64" height="38" rx="4" fill="rgba(8,13,24,0.95)"
+                    stroke="rgba(201,162,75,0.55)" stroke-width="1.2" />
+                  <text x="236" y="126" font-family="'IBM Plex Mono', monospace" font-size="8" fill="#C9A24B"
+                    font-weight="700" text-anchor="middle">⏸ PAUSED</text>
+                  <text x="236" y="138" font-family="'IBM Plex Mono', monospace" font-size="6" fill="#8B93A9"
+                    text-anchor="middle">// watching you</text>
+                </g>
+              </g>
+
+              <!-- Full Seated Developer Character (Visible sitting posture) -->
+              <g class="dev-character-fullbody">
+                <!-- Seated Legs & Pants -->
+                <!-- Far Leg (Depth) -->
+                <path d="M138 168 L168 174 C175 178, 178 185, 175 194 L164 230 L176 230 L188 190 L150 174 Z"
+                  fill="#0E1424" />
+                <!-- Far Sneaker -->
+                <path d="M162 230 L184 230 C188 230, 190 234, 186 237 L158 237 Z" fill="#E4EDF8" />
+                <rect x="156" y="235" width="32" height="2" fill="#00C2A8" />
+
+                <!-- Near Leg (Thigh resting forward on seat, bending down at knee) -->
+                <path
+                  d="M78 164 L146 168 C158 170, 164 178, 160 188 L146 228 L158 228 L172 184 C176 172, 166 162, 148 160 L80 156 Z"
+                  fill="url(#pantsGrad)" stroke="rgba(234,237,244,0.12)" stroke-width="1" />
+
+                <!-- Near Sneaker -->
+                <path d="M142 228 L168 228 C173 228, 176 233, 172 237 L138 237 Z" fill="#FFFFFF" />
+                <rect x="136" y="235" width="38" height="2.5" fill="#C9A24B" />
+
+                <!-- Seated Torso & Jacket -->
+                <path d="M72 162 C68 124, 86 108, 116 110 C132 112, 142 128, 144 164 Z" fill="url(#bodyGrad)"
+                  stroke="rgba(234,237,244,0.14)" stroke-width="1.5" />
+                <path d="M102 110 Q112 120 122 110" stroke="#2B3A5A" stroke-width="2.5" fill="none"
+                  stroke-linecap="round" />
+
+                <!-- Typing Arms & Hands placed naturally on laptop -->
+                <g class="dev-arms-group" id="devArmsGroup">
+                  <!-- Left Arm (Reaching forward to keyboard) -->
+                  <path class="dev-arm arm-l" d="M88 132 C104 138, 134 146, 172 153" stroke="#16223C"
+                    stroke-width="11.5" stroke-linecap="round" fill="none" />
+                  <ellipse class="dev-hand hand-l" cx="175" cy="153" rx="5" ry="3.8" fill="url(#skinGrad)" />
+
+                  <!-- Right Arm (Reaching forward to keyboard) -->
+                  <path class="dev-arm arm-r" d="M106 130 C124 138, 150 148, 188 154" stroke="#1E2C4D" stroke-width="10"
+                    stroke-linecap="round" fill="none" />
+                  <ellipse class="dev-hand hand-r" cx="191" cy="154" rx="5" ry="3.8" fill="url(#skinGrad)" />
+                </g>
+              </g>
+
+              <!-- =======================================================
+                   CHARACTER HEAD SYSTEM (Anchored at cx=112, cy=82)
+                   ======================================================= -->
+              <g id="characterHeadAnchor" class="character-head-anchor">
+
+                <!-- 1. SIDE HEAD (Focused on Coding / facing screen) -->
+                <g id="headCoding" class="head-coding">
+                  <!-- Head Contour -->
+                  <circle cx="110" cy="81" r="21" fill="url(#skinGrad)" stroke="rgba(234,237,244,0.12)"
+                    stroke-width="1.2" />
+
+                  <!-- Clean Side Hair -->
+                  <path
+                    d="M86 81 C84 56, 106 50, 130 56 C138 64, 136 75, 132 80 C126 70, 116 64, 104 66 C92 68, 88 75, 86 81 Z"
+                    fill="url(#hairGrad)" />
+                  <path d="M102 60 Q114 56, 126 66 Q114 66, 102 60 Z" fill="#2E3C5C" opacity="0.6" />
+
+                  <!-- Face Profile Plate -->
+                  <path d="M102 72 C120 72, 128 80, 128 90 C128 101, 115 105, 104 103 Z" fill="url(#skinGrad)" />
+
+                  <!-- Minimalist Modern Headphones (Side View) -->
+                  <g class="dev-headphones-side">
+                    <path d="M94 82 C94 60, 110 54, 118 54" stroke="#0B111E" stroke-width="3.8" fill="none"
+                      stroke-linecap="round" />
+                    <ellipse cx="95" cy="82" rx="7.5" ry="11" fill="#121B30" stroke="#C9A24B" stroke-width="1.3" />
+                    <circle cx="95" cy="82" r="3" fill="#080D18" />
+                  </g>
+
+                  <!-- Sleek Wireframe Side Glasses & Eye -->
+                  <rect x="111" y="78" width="16" height="13" rx="3.5" fill="rgba(10,15,28,0.2)" stroke="#C9A24B"
+                    stroke-width="1.4" />
+                  <ellipse cx="118" cy="84.5" rx="4.5" ry="3.5" fill="#FFFFFF" />
+                  <circle cx="119.5" cy="84.5" r="2" fill="#0A0F1C" />
+
+                  <!-- Eyebrow & Focused Mouth -->
+                  <path d="M110 75 Q118 72, 126 75" stroke="#2D1F18" stroke-width="2" fill="none"
+                    stroke-linecap="round" />
+                  <path d="M114 96 Q119 99, 124 96" stroke="#6E3D28" stroke-width="1.4" fill="none"
+                    stroke-linecap="round" />
+                </g>
+
+                <!-- 2. FRONT HEAD (Premium Face with Sleek Headphones & Glasses) -->
+                <g id="headTurned" class="head-turned">
+                  <!-- Headband across top of head -->
+                  <path d="M88 79 C86 50, 136 50, 134 79" stroke="#0B111E" stroke-width="4" fill="none"
+                    stroke-linecap="round" />
+
+                  <!-- Headphone Earcups on sides -->
+                  <ellipse cx="86" cy="83" rx="5.5" ry="9.5" fill="#121B30" stroke="#C9A24B" stroke-width="1.3" />
+                  <ellipse cx="136" cy="83" rx="5.5" ry="9.5" fill="#121B30" stroke="#C9A24B" stroke-width="1.3" />
+
+                  <!-- Head Contour & Ears -->
+                  <ellipse cx="111" cy="82" rx="23" ry="25" fill="url(#skinGrad)" stroke="rgba(234,237,244,0.14)"
+                    stroke-width="1.2" />
+
+                  <!-- Clean Modern Haircut -->
+                  <path
+                    d="M86 74 C84 54, 104 49, 111 49 C118 49, 138 54, 136 74 C130 65, 122 62, 111 64 C100 62, 92 65, 86 74 Z"
+                    fill="url(#hairGrad)" />
+                  <path
+                    d="M88 68 C95 62, 106 60, 111 66 C116 60, 127 62, 134 68 C130 74, 127 77, 123 77 C118 71, 114 71, 111 74 C108 71, 104 71, 99 77 C95 77, 92 74, 88 68 Z"
+                    fill="#1E2A44" />
+
+                  <!-- Sleek Titanium/Gold Wireframe Glasses -->
+                  <g class="front-glasses">
+                    <rect x="92" y="76" width="16" height="13.5" rx="3.5" fill="rgba(10,15,28,0.18)" stroke="#C9A24B"
+                      stroke-width="1.4" />
+                    <rect x="114" y="76" width="16" height="13.5" rx="3.5" fill="rgba(10,15,28,0.18)" stroke="#C9A24B"
+                      stroke-width="1.4" />
+                    <line x1="108" y1="81" x2="114" y2="81" stroke="#C9A24B" stroke-width="1.6" />
+                    <line x1="88" y1="81" x2="92" y2="81" stroke="#C9A24B" stroke-width="1.3" />
+                    <line x1="130" y1="81" x2="134" y2="81" stroke="#C9A24B" stroke-width="1.3" />
+                    <line x1="94" y1="78" x2="99" y2="78" stroke="rgba(255,255,255,0.45)" stroke-width="1"
+                      stroke-linecap="round" />
+                    <line x1="116" y1="78" x2="121" y2="78" stroke="rgba(255,255,255,0.45)" stroke-width="1"
+                      stroke-linecap="round" />
+                  </g>
+
+                  <!-- Left Eye White -->
+                  <ellipse cx="100" cy="82" rx="5.5" ry="4.5" fill="#FFFFFF" />
+                  <!-- Right Eye White -->
+                  <ellipse cx="122" cy="82" rx="5.5" ry="4.5" fill="#FFFFFF" />
+
+                  <!-- Left Pupil Group (Direct cursor tracking) -->
+                  <g id="pupilLeft" class="eye-pupil">
+                    <circle cx="100" cy="82" r="2.7" fill="url(#irisGrad)" />
+                    <circle cx="100" cy="82" r="1.3" fill="#060A14" />
+                    <circle cx="101" cy="81.2" r="0.8" fill="#FFFFFF" />
+                  </g>
+
+                  <!-- Right Pupil Group (Direct cursor tracking) -->
+                  <g id="pupilRight" class="eye-pupil">
+                    <circle cx="122" cy="82" r="2.7" fill="url(#irisGrad)" />
+                    <circle cx="122" cy="82" r="1.3" fill="#060A14" />
+                    <circle cx="123" cy="81.2" r="0.8" fill="#FFFFFF" />
+                  </g>
+
+                  <!-- Eyebrows (Normal vs Angry) -->
+                  <g class="dev-eyebrows">
+                    <g id="browNormal" class="brow-normal">
+                      <path d="M93 72 Q99 70, 105 73" stroke="#2D1F18" stroke-width="1.8" fill="none"
+                        stroke-linecap="round" />
+                      <path d="M117 73 Q123 70, 129 72" stroke="#2D1F18" stroke-width="1.8" fill="none"
+                        stroke-linecap="round" />
+                    </g>
+                    <g id="browAngry" class="brow-angry">
+                      <path d="M93 74 L105 71" stroke="#FF6B9D" stroke-width="2.2" fill="none" stroke-linecap="round" />
+                      <path d="M117 71 L129 74" stroke="#FF6B9D" stroke-width="2.2" fill="none"
+                        stroke-linecap="round" />
+                    </g>
+                  </g>
+
+                  <!-- Subtle Nose Contour -->
+                  <path d="M110 85 Q112 87, 110 89" stroke="#DFAC8A" stroke-width="1.1" fill="none"
+                    stroke-linecap="round" />
+
+                  <!-- Mouth Expressions -->
+                  <g class="dev-mouth">
+                    <path id="mouthNormal" class="mouth-normal" d="M106 95 Q111 97.5, 116 95" stroke="#6E3D28"
+                      stroke-width="1.5" fill="none" stroke-linecap="round" />
+                    <path id="mouthAngry" class="mouth-angry" d="M105 97.5 Q111 92, 117 97.5" stroke="#FF6B9D"
+                      stroke-width="2" fill="none" stroke-linecap="round" />
+                  </g>
+
+                  <!-- Anime Anger Spark -->
+                  <g id="angerEffects" class="anger-effects">
+                    <path class="anger-cross" d="M128 58 L134 58 M131 55 L131 61 M129 56 L133 60 M133 56 L129 60"
+                      stroke="#FF6B9D" stroke-width="1.8" stroke-linecap="round" />
+                  </g>
+                </g>
+              </g>
+
+              <!-- Floating Tech Accents -->
+              <g class="floating-tech">
+                <text x="20" y="38" font-family="'IBM Plex Mono', monospace" font-size="12" fill="rgba(201,162,75,0.4)"
+                  class="illus-float-1">{ }</text>
+                <text x="312" y="48" font-family="'IBM Plex Mono', monospace" font-size="10"
+                  fill="rgba(116,217,174,0.4)" class="illus-float-2">0101</text>
+                <circle cx="328" cy="100" r="2.5" fill="rgba(255,107,157,0.3)" class="illus-float-1" />
+              </g>
+            </svg>
+
+            <p class="illus-caption mono" id="illusCaption">// status: <span id="statusLabel">focus mode —
+                coding...</span></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SKILLS — mosaic -->
+      <section id="skills" class="wrap">
+        <div class="section-head reveal">
+          <h2>What I work with</h2>
+          <p>AI-first tooling, backed by solid engineering fundamentals.</p>
+        </div>
+        <div class="mosaic reveal">
+          <div class="glow-card glass big" id="aiTile">
+            <h4>AI &amp; Prompt Engineering</h4>
+            <div class="blur-lines">
+              <p class="blur-line">Saves me real time on office work — I lean on it daily.</p>
+              <p class="blur-line">Powers my own side projects, end to end.</p>
+              <p class="blur-line">Always exploring the next tool worth learning.</p>
+            </div>
+            <div class="chip-row"><span class="chip">GitHub Copilot</span><span class="chip">ChatGPT</span><span
+                class="chip">Claude</span><span class="chip">Prompt Engineering</span></div>
+          </div>
+          <div class="glow-card glass">
+            <h4>Automation &amp; Frameworks</h4>
+            <div class="chip-row"><span class="chip">Selenium</span><span class="chip">Playwright</span><span
+                class="chip">TestNG</span><span class="chip">JUnit</span></div>
+          </div>
+          <div class="glow-card glass">
+            <h4>QA &amp; PM Tools</h4>
+            <div class="chip-row"><span class="chip">Agile Accelerator</span><span class="chip">HP ALM</span><span
+                class="chip">Postman</span></div>
+          </div>
+          <div class="glow-card glass">
+            <h4>Platforms</h4>
+            <div class="chip-row"><span class="chip">Facets</span><span class="chip">Salesforce</span></div>
+          </div>
+          <div class="glow-card glass">
+            <h4>Domain &amp; Database</h4>
+            <div class="chip-row"><span class="chip">Healthcare</span><span class="chip">Claims</span><span
+                class="chip">EDI</span><span class="chip">SQL</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PROJECTS — horizontal gallery + modal -->
+      <section id="projects" class="wrap">
+        <div class="section-head reveal">
+          <h2>Projects powered by AI</h2>
+          <p>Scroll sideways — click the flagship card to open it.</p>
+        </div>
+        <div class="gallery reveal">
+          <div class="proj-card glow-card glass" data-modal>
+            <div>
+              <div class="mono">// flagship project</div>
+              <h3>Self-Healing Test Automation Framework</h3>
+              <p>An AI-assisted layer on Selenium/Playwright that auto-repairs broken UI locators when the front end
+                changes — cutting the manual maintenance that usually breaks suites after every release.</p>
+            </div>
+            <div>
+              <div class="tag-row"><span class="tag">Selenium</span><span class="tag">Playwright</span><span
+                  class="tag">AI-assisted</span></div>
+              <div class="open-hint">click to open →</div>
+            </div>
+          </div>
+          <div class="proj-card glow-card glass pending">
+            <div>
+              <div class="mono">// awaiting details</div>
+              <h3>Project 02</h3>
+              <p>Reserved — send the name, stack, and description and it goes here.</p>
+            </div>
+            <div class="tag-row"><span class="tag">TBD</span></div>
+          </div>
+          <div class="proj-card glow-card glass pending">
+            <div>
+              <div class="mono">// awaiting details</div>
+              <h3>Project 03</h3>
+              <p>Reserved — this gallery scrolls, so add as many as you actually have.</p>
+            </div>
+            <div class="tag-row"><span class="tag">TBD</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- EXPERIENCE — dotted timeline -->
+      <section id="experience" class="wrap">
+        <div class="section-head reveal">
+          <h2>Career log</h2>
+          <p>Most recent first.</p>
+        </div>
+        <div class="timeline reveal">
+          <div class="entry">
+            <div class="entry-meta"><span class="tag">current</span><span>Jun 2024 — Present</span></div>
+            <h3>Program Analyst — Automation Test Engineer</h3>
+            <div class="org">Cognizant Technology Solutions · Kolkata · Healthcare Domain</div>
+            <ul>
+              <li>Build and maintain automated test suites with Java-Selenium and Playwright, improving regression
+                coverage for healthcare applications.</li>
+              <li>Bring GitHub Copilot, ChatGPT, and Claude into daily workflows for script generation, edge-case
+                discovery, and defect root-cause analysis.</li>
+              <li>Test Facets and Salesforce for claims and policy management; validate EDI transactions and run API
+                testing via Postman.</li>
+              <li><strong>Qualified for the GenC Digital Honors program</strong> — Cognizant's merit-based track
+                recognizing technical excellence and readiness for advanced roles.</li>
+              <li>Completed the Playwright Automation Testing certification (Udemy) — end-to-end browser automation,
+                architecture, and CI/CD integration.</li>
+            </ul>
+          </div>
+          <div class="entry">
+            <div class="entry-meta"><span>Dec 2023 — May 2024</span></div>
+            <h3>Intern — Software Test Engineer</h3>
+            <div class="org">Cognizant Technology Solutions · Coimbatore</div>
+            <ul>
+              <li>Gained hands-on experience in automation and manual testing for enterprise applications.</li>
+              <li>Collaborated with senior engineers on test strategy and execution.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- EDUCATION — replaces the old Milestones/Achievements mix -->
+      <section id="education" class="wrap">
+        <div class="section-head reveal">
+          <h2>Academic background</h2>
+        </div>
+        <div class="edu-grid reveal">
+          <div class="edu-card glow-card glass">
+            <div class="edu-mark">B.Tech</div>
+            <h3>B.Tech, Computer Science &amp; Engineering</h3>
+            <div class="edu-org">Guru Nanak Institute of Technology, West Bengal</div>
+            <span class="edu-duration mono">2019 – 2023</span>
+          </div>
+          <div class="edu-card glow-card glass">
+            <div class="edu-mark">HS</div>
+            <h3>Higher Secondary Certificate — Science</h3>
+            <div class="edu-org">Harishchak High School, WBCHSE, West Bengal</div>
+            <span class="edu-duration mono">2019</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONTACT — two-column card (Meridian UI) -->
+      <section id="contact" class="wrap">
+        <div class="contact-card glow-card glass reveal">
+          <div>
+            <h2>Let's build something.</h2>
+            <p>Open to conversations on AI-assisted engineering, automation, and anything built at the edge of the two.
+            </p>
+          </div>
+          <div class="contact-list">
+            <div class="row"><span>Email</span><a href="mailto:tapendupal122@gmail.com"
+                class="magnetic">tapendupal122@gmail.com</a></div>
+            <div class="row"><span>GitHub</span><a href="https://github.com/PalTapendu" target="_blank" rel="noopener"
+                class="magnetic">github.com/PalTapendu</a></div>
+            <div class="row"><span>LinkedIn</span><a href="https://www.linkedin.com/in/tapendu-pal-b23273224/"
+                target="_blank" rel="noopener" class="magnetic">/tapendu-pal-b23273224</a></div>
+            <div class="row"><span>Location</span><span>Hooghly, West Bengal</span></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap"><span>© 2026 Tapendu Pal</span><span class="mono">design: Apex</span></div>
+    </footer>
+
+  </div><!-- /pageContent -->
+
+  <button id="toTop" aria-label="Back to top">↑</button>
+
+  <div id="modalOverlay">
+    <div class="modal glass">
+      <div class="modal-bar"><span class="mono">self-healing-framework.md</span><span class="modal-close"
+          id="modalClose">✕</span></div>
+      <div class="modal-body">
+        <h3>Self-Healing Test Automation Framework</h3>
+        <p>An AI-assisted layer built on top of Selenium and Playwright that automatically repairs broken UI locators
+          when the application's front end changes — cutting down the manual maintenance that usually breaks automated
+          suites after every release.</p>
+        <div class="tag-row"><span class="tag">Selenium</span><span class="tag">Playwright</span><span
+            class="tag">AI-assisted</span></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
