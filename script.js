@@ -215,7 +215,7 @@ function typeLine(text, isAssertion, cb, runId) {
   line.className = 'console-line';
   const mark = document.createElement('span');
   mark.className = 'mark';
-  mark.textContent = isAssertion ? '…' : '$';
+  mark.textContent = isAssertion ? '>' : '$';
   const txt = document.createElement('span');
   line.appendChild(mark); line.appendChild(txt);
   consoleBody.appendChild(line);
