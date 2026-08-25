@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <rect width="32" height="32" rx="7" fill="#0A0F1C"/>
+  <text x="16" y="21.5" font-family="'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14.5" font-weight="800" text-anchor="middle">
+    <tspan fill="#EAEDF4">TP</tspan><tspan fill="#C9A24B">.</tspan>
+  </text>
+</svg>
