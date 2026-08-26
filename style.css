@@ -1765,7 +1765,7 @@ footer .wrap {
   align-items: center;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 11.5px;
-  color: var(--slate-dim);
+  color: var(--slate);
   flex-wrap: wrap;
   gap: 10px;
 }

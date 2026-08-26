@@ -84,13 +84,17 @@
   <!-- <meta name="google-site-verification" content="PASTE_YOUR_TOKEN_HERE"> -->
 
   <!-- ═══════════════════════════════════════════════════════
-       FONTS  (display=swap already present — prevents FOIT)
+       FONTS  (async non-render-blocking + display=swap)
   ═══════════════════════════════════════════════════════ -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
-    rel="stylesheet">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@700;800&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap"
+    media="print" onload="this.media='all'">
+  <noscript>
+    <link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@700;800&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap">
+  </noscript>
 
   <link rel="stylesheet" href="style.css">
 </head>
@@ -790,7 +794,7 @@
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <script src="script.min.js" defer></script>
 </body>
 
 </html>
