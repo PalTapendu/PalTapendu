@@ -371,8 +371,7 @@ const toTop = document.getElementById('toTop');
 document.addEventListener('scroll', () => {
   const h = document.documentElement;
   progress.style.width = (h.scrollTop / (h.scrollHeight - h.clientHeight) * 100) + '%';
-  const isChatOpen = document.getElementById('panelFrame')?.classList.contains('open');
-  toTop.classList.toggle('show', h.scrollTop > 600 && !isChatOpen);
+  toTop.classList.toggle('show', h.scrollTop > 600);
 }, { passive: true });
 toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
@@ -803,11 +802,9 @@ if (fabHolder && fab && panelFrame) {
   function openPanel() {
     panelFrame.classList.add('open');
     fab.classList.add('is-open');
+    document.body.classList.add('chat-is-open');
     if (tooltip) tooltip.classList.remove('show');
-    if (toTop) {
-      toTop.classList.add('hide-by-chat');
-      toTop.classList.remove('show');
-    }
+    if (toTop) toTop.classList.add('chat-left-shift');
     setTimeout(() => {
       if (apInput) apInput.focus();
     }, 280);
@@ -816,13 +813,8 @@ if (fabHolder && fab && panelFrame) {
   function closePanel() {
     panelFrame.classList.remove('open');
     fab.classList.remove('is-open');
-    if (toTop) {
-      toTop.classList.remove('hide-by-chat');
-      const h = document.documentElement;
-      if (h.scrollTop > 600) {
-        toTop.classList.add('show');
-      }
-    }
+    document.body.classList.remove('chat-is-open');
+    if (toTop) toTop.classList.remove('chat-left-shift');
   }
 
   fab.addEventListener('click', () => {

@@ -2259,39 +2259,76 @@ footer .wrap {
   border: 1px solid var(--line-strong);
   border-radius: 50%;
   background: rgba(10, 15, 28, 0.85);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   color: var(--brass-soft);
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
   pointer-events: none;
-  transform: translateY(8px) scale(0.9);
-  transition: opacity .3s ease, transform .3s ease, border-color .2s, background .2s;
+  transform: translateY(10px) scale(0.88);
+  transition: transform 0.48s cubic-bezier(0.34, 1.45, 0.64, 1),
+    opacity 0.3s ease,
+    border-color 0.25s ease,
+    background 0.25s ease,
+    box-shadow 0.3s ease;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 15px;
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.65), 0 0 14px rgba(201, 162, 75, 0.12);
+  cursor: pointer;
+  outline: none;
 }
 
 #toTop.show {
   opacity: 1;
   pointer-events: auto;
-  transform: translateY(0) scale(1);
+  transform: translate(0, 0) scale(1);
 }
 
-/* Hide back-to-top button completely when AI chat assistant is open */
-#toTop.hide-by-chat,
-#panelFrame.open ~ #toTop,
-body:has(#panelFrame.open) #toTop {
-  opacity: 0 !important;
-  pointer-events: none !important;
-  transform: translateY(16px) scale(0.85) !important;
-  visibility: hidden !important;
+/* S-tier spring animation: Glides to the LEFT SIDE of Chat Window when opened */
+#panelFrame.open ~ #toTop.show,
+body.chat-is-open #toTop.show,
+#toTop.chat-left-shift.show {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+  transform: translate(-389px, 63px) scale(1);
+  border-color: rgba(201, 162, 75, 0.5);
+  background: rgba(13, 20, 38, 0.95);
+  box-shadow: 0 12px 30px -4px rgba(0, 0, 0, 0.75), 0 0 22px rgba(201, 162, 75, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+}
+
+/* When chat is open but user is at the top of the page */
+#panelFrame.open ~ #toTop:not(.show),
+body.chat-is-open #toTop:not(.show),
+#toTop.chat-left-shift:not(.show) {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-389px, 75px) scale(0.85);
 }
 
 #toTop:hover {
   border-color: var(--brass);
-  background: rgba(20, 31, 56, 0.95);
-  color: #ffffff;
+  background: rgba(20, 31, 56, 0.98);
+  color: #FFFFFF;
+  box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.75), 0 0 24px rgba(201, 162, 75, 0.4);
+}
+
+@media (max-width: 540px) {
+  /* On small mobile screens, glide smoothly above or beside */
+  #panelFrame.open ~ #toTop.show,
+  body.chat-is-open #toTop.show,
+  #toTop.chat-left-shift.show {
+    transform: translate(calc(-100vw + 84px), 63px) scale(0.95);
+  }
+
+  #panelFrame.open ~ #toTop:not(.show),
+  body.chat-is-open #toTop:not(.show),
+  #toTop.chat-left-shift:not(.show) {
+    transform: translate(calc(-100vw + 84px), 75px) scale(0.8);
+  }
 }
 
 /* =========================================================
@@ -2535,10 +2572,11 @@ body:has(#panelFrame.open) #toTop {
 
 #assistantFab.is-open {
   opacity: 0;
-  transform: scale(0.4);
+  transform: scale(1.4) rotate(45deg);
+  filter: blur(2.5px);
   animation: none;
   pointer-events: none;
-  transition: transform .25s ease, opacity .2s ease;
+  transition: transform 0.36s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.24s ease, filter 0.24s ease;
 }
 
 /* ---- Hover tooltip ---- */
@@ -2574,7 +2612,7 @@ body:has(#panelFrame.open) #toTop {
   font-weight: 600;
 }
 
-/* ---- Panel: MORPHING EXPANSION / COLLAPSE (Seamlessly grows from & shrinks to icon) ---- */
+/* ---- Panel: MORPHING EXPANSION / COLLAPSE (Seamlessly grows directly from FAB icon) ---- */
 #panelFrame {
   position: fixed;
   right: 28px;
@@ -2587,23 +2625,27 @@ body:has(#panelFrame.open) #toTop {
   background: conic-gradient(from var(--angle, 0deg), var(--brass), var(--violet), var(--cyan), var(--brass));
   animation: borderSpin 6s linear infinite;
   transform-origin: calc(100% - 27px) calc(100% - 27px);
-  transform: scale(0.14);
+  transform: scale(0.14) rotate(-6deg);
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transition: transform .4s cubic-bezier(.2, .9, .25, 1.15),
-    border-radius .4s cubic-bezier(.2, .9, .25, 1.15),
-    opacity .25s ease,
-    visibility .4s;
+  transition: transform 0.48s cubic-bezier(0.34, 1.42, 0.64, 1),
+    border-radius 0.45s cubic-bezier(0.34, 1.42, 0.64, 1),
+    opacity 0.28s ease,
+    visibility 0.48s;
   box-shadow: 0 28px 70px -15px rgba(0, 0, 0, 0.8), 0 0 35px rgba(201, 162, 75, 0.2);
 }
 
 #panelFrame.open {
-  transform: scale(1);
+  transform: scale(1) rotate(0deg);
   border-radius: 20px;
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
+  transition: transform 0.52s cubic-bezier(0.34, 1.45, 0.64, 1),
+    border-radius 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.35s ease,
+    visibility 0.52s;
 }
 
 @property --angle {
@@ -2663,6 +2705,26 @@ body:has(#panelFrame.open) #toTop {
   justify-content: center;
   flex-shrink: 0;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+#panelFrame.open .ap-avatar {
+  animation: avatarBlossom 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes avatarBlossom {
+  0% {
+    transform: scale(0.3) rotate(-25deg);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.15) rotate(4deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
 }
 
 .avatar-glow-ring {
