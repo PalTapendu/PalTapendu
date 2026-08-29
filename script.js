@@ -533,7 +533,7 @@ document.querySelectorAll('.proj-card[data-project]').forEach(card => {
       const bodyH3 = overlay.querySelector('.modal-body h3');
       const bodyP = overlay.querySelector('.modal-body p');
       const tagRow = overlay.querySelector('.modal-body .tag-row');
-      
+
       if (barSpan) barSpan.textContent = data.file;
       if (bodyH3) bodyH3.textContent = data.title;
       if (bodyP) bodyP.textContent = data.body;
