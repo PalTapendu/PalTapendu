@@ -371,7 +371,8 @@ const toTop = document.getElementById('toTop');
 document.addEventListener('scroll', () => {
   const h = document.documentElement;
   progress.style.width = (h.scrollTop / (h.scrollHeight - h.clientHeight) * 100) + '%';
-  toTop.classList.toggle('show', h.scrollTop > 600);
+  const isChatOpen = document.getElementById('panelFrame')?.classList.contains('open');
+  toTop.classList.toggle('show', h.scrollTop > 600 && !isChatOpen);
 }, { passive: true });
 toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
@@ -803,6 +804,10 @@ if (fabHolder && fab && panelFrame) {
     panelFrame.classList.add('open');
     fab.classList.add('is-open');
     if (tooltip) tooltip.classList.remove('show');
+    if (toTop) {
+      toTop.classList.add('hide-by-chat');
+      toTop.classList.remove('show');
+    }
     setTimeout(() => {
       if (apInput) apInput.focus();
     }, 280);
@@ -811,6 +816,13 @@ if (fabHolder && fab && panelFrame) {
   function closePanel() {
     panelFrame.classList.remove('open');
     fab.classList.remove('is-open');
+    if (toTop) {
+      toTop.classList.remove('hide-by-chat');
+      const h = document.documentElement;
+      if (h.scrollTop > 600) {
+        toTop.classList.add('show');
+      }
+    }
   }
 
   fab.addEventListener('click', () => {
