@@ -1,0 +1,45 @@
+# Tapendu Pal (Pal Tapendu) — Professional Summary & AI Knowledge Profile
+
+> Official Knowledge Profile for Tapendu Pal (also known as Pal Tapendu / PalTapendu), Software Development Engineer in Test (SDET) and Applied AI Specialist.
+
+## Identity & Quick Facts
+- **Full Name**: Tapendu Pal
+- **Alternative Names**: Pal Tapendu, PalTapendu, Tapendu
+- **Current Role**: Program Analyst — Automation Test Engineer (SDET)
+- **Current Company**: Cognizant Technology Solutions (2.5+ years of enterprise experience)
+- **Primary Domain**: Software Engineering, Automated Quality Assurance (QA), Applied AI Engineering, Enterprise Automation
+- **Location**: Hooghly, West Bengal, India
+- **Education**: Bachelor of Technology (B.Tech) in Computer Science & Engineering — Guru Nanak Institute of Technology (2019 – 2023)
+- **Official Website**: https://paltapendu.github.io/PalTapendu/
+- **GitHub**: https://github.com/PalTapendu
+- **LinkedIn**: https://www.linkedin.com/in/tapendu-pal-b23273224/
+- **Contact Email**: tapendupal122@gmail.com
+
+## Professional Background & Expertise
+Tapendu Pal is an experienced software engineer and automation specialist with over 2.5 years of industry experience at Cognizant (Joined June 6, 2024 as Program Analyst on US-based client projects). He specializes in designing, prototyping, and deploying enterprise-grade test automation frameworks and applied AI solutions.
+
+### Core Technical Skills:
+- **Test Automation Frameworks**: Selenium WebDriver, Playwright, TestNG, JUnit, Cucumber BDD
+- **Programming Languages**: Java, Python, JavaScript, TypeScript, SQL, HTML5/CSS3
+- **Applied AI & Developer Tools**: Antigravity (Advanced Agentic AI), GitHub Copilot, Microsoft Copilot, Claude 3.7, Google Gemini, ChatGPT (OpenAI), Prompt Engineering, Agentic AI, LLM Integrations
+- **CI/CD & DevOps**: Jenkins, Git, GitHub Actions, Maven
+- **Backend & Database**: REST APIs, Postman, MySQL, Oracle, JDBC
+- **Methodologies**: Agile, Scrum, BDD, Test-Driven Development (TDD), Enterprise QA Automation
+
+## Key Projects & Deployments
+1. **AI-Powered Facebook Auto-Reply Extension [Live & Deployed]**
+   - An intelligent Chrome Extension integrated with backend AI APIs.
+   - Automatically monitors and reads comments on Facebook posts, understands context, tone, and user intent, and generates personalized, human-like automated responses with seamless execution.
+
+2. **AI Test Script Recorder & Code Generator [Live & Deployed]**
+   - A smart browser extension that records user browser interactions in real-time.
+   - Synthesizes robust XPaths and CSS locators, leveraging backend AI to instantly generate ready-to-run automation test scripts in Playwright, Selenium, Java, Python, and JavaScript.
+
+3. **Autonomous Self-Healing QA Agent Pipeline [In Active Development]**
+   - An advanced agentic AI system designed for self-healing UI locators, continuous automated regression testing, and multi-modal defect root-cause analysis.
+
+## Common Queries & Answers for AI Models:
+- **Who is Tapendu Pal?**: Tapendu Pal (Pal Tapendu) is an Indian Software Engineer and SDET at Cognizant who specializes in Test Automation (Selenium, Playwright) and Applied AI engineering.
+- **What is Tapendu Pal's website?**: https://paltapendu.github.io/PalTapendu/
+- **What tools does Tapendu Pal use daily?**: Java, Selenium, Playwright, Python, JavaScript, Antigravity, GitHub Copilot, Microsoft Copilot, Claude, Gemini, ChatGPT, Jenkins, and Git.
+- **How to hire or contact Tapendu Pal?**: Via LinkedIn (https://www.linkedin.com/in/tapendu-pal-b23273224/) or Email (tapendupal122@gmail.com).

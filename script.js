@@ -264,8 +264,53 @@ new IntersectionObserver((entries) => {
 }, { threshold: 0.45 }).observe(consoleBox);
 
 /* ============================================================
-   5. Animated stat counters (Integers & Floats)
+   5. Animated stat counters & Live Dynamic Tenure Engine
    ============================================================ */
+// Real-time dynamic Cognizant experience calculator (Start Date: June 6, 2024)
+const COGNIZANT_JOIN_DATE = new Date(2024, 5, 6, 0, 0, 0); // June 6, 2024
+
+function updateLiveCognizantTenure() {
+  const now = new Date();
+  const displayEl = document.getElementById('liveTenureDisplay');
+  const clockEl = document.getElementById('liveTenureClock');
+  if (!displayEl && !clockEl) return;
+
+  let years = now.getFullYear() - COGNIZANT_JOIN_DATE.getFullYear();
+  let months = now.getMonth() - COGNIZANT_JOIN_DATE.getMonth();
+  let days = now.getDate() - COGNIZANT_JOIN_DATE.getDate();
+
+  if (days < 0) {
+    months -= 1;
+    const prevMonthDays = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+    days += prevMonthDays;
+  }
+  if (months < 0) {
+    years -= 1;
+    months += 12;
+  }
+
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+
+  const parts = [];
+  if (years > 0) parts.push(years === 1 ? '1 Yr' : `${years} Yrs`);
+  parts.push(months === 1 ? '1 Mo' : `${months} Mos`);
+  parts.push(days === 1 ? '1 Day' : `${days} Days`);
+
+  if (displayEl) {
+    displayEl.textContent = parts.join(', ');
+  }
+  if (clockEl) {
+    clockEl.textContent = `· ${hours}:${minutes}:${seconds}`;
+  }
+}
+
+// Run immediately and update every second
+updateLiveCognizantTenure();
+setInterval(updateLiveCognizantTenure, 1000);
+
+// Stat Number Counting Animations
 document.querySelectorAll('[data-count], [data-count-float]').forEach(el => {
   const isFloat = el.hasAttribute('data-count-float');
   const target = isFloat
@@ -276,7 +321,7 @@ document.querySelectorAll('[data-count], [data-count-float]').forEach(el => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         let start = null;
-        const duration = 1100;
+        const duration = 1200;
         function step(ts) {
           if (!start) start = ts;
           const p = Math.min((ts - start) / duration, 1);
@@ -291,8 +336,31 @@ document.querySelectorAll('[data-count], [data-count-float]').forEach(el => {
         el.textContent = isFloat ? '0.0' : '0';
       }
     });
-  }, { threshold: 0.5 });
+  }, { threshold: 0.35 });
   io.observe(el);
+});
+
+// Interactive Flip Card Mobile / Keyboard Toggles
+const statFlippers = document.querySelectorAll('.stat-flipper');
+statFlippers.forEach(card => {
+  // Mobile / Touch click toggle
+  card.addEventListener('click', (e) => {
+    // If click is not inside a link or button, toggle
+    if (window.matchMedia('(hover: none)').matches || window.innerWidth <= 1024) {
+      const isCurrentlyFlipped = card.classList.contains('is-flipped');
+      // Unflip other cards
+      statFlippers.forEach(other => { if (other !== card) other.classList.remove('is-flipped'); });
+      card.classList.toggle('is-flipped', !isCurrentlyFlipped);
+    }
+  });
+
+  // Keyboard accessibility
+  card.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      card.classList.toggle('is-flipped');
+    }
+  });
 });
 
 /* ============================================================
@@ -430,17 +498,57 @@ const spy = new IntersectionObserver(entries => {
 sections.forEach(s => s && spy.observe(s));
 
 /* ============================================================
-   11. Project modal
+   11. Dynamic Project modal
    ============================================================ */
+const projectData = {
+  'fb-extension': {
+    file: 'ai-facebook-auto-reply.md',
+    title: 'AI-Powered Facebook Auto-Reply Extension',
+    body: 'An intelligent Chrome Extension with integrated backend AI APIs. When active, it scans and reads incoming comments on Facebook posts, understands the contextual intent, sentiment, and tone, and leverages backend AI API calls to generate personalized, human-like automated responses with seamless execution.',
+    tags: ['Chrome Extension', 'AI API Integration', 'Contextual LLM', 'Automation', 'JavaScript']
+  },
+  'test-recorder': {
+    file: 'ai-test-script-recorder.md',
+    title: 'AI Test Script Recorder & Code Generator',
+    body: 'A smart Chrome Extension that records user browser interactions in real-time. It synthesizes reliable XPaths, CSS locators, and action flows, then leverages backend AI to output production-ready test automation scripts in Playwright, Selenium, Java, Python, and JavaScript.',
+    tags: ['Chrome Extension', 'Playwright', 'Selenium', 'AI CodeGen', 'XPath Synthesis']
+  },
+  'qa-agent': {
+    file: 'autonomous-qa-agent.md',
+    title: 'Autonomous Self-Healing QA Agent Pipeline',
+    body: 'An advanced agentic AI system currently under active development. Designed to autonomously execute test suites, detect broken UI locators, synthesize self-healing repairs on the fly, and perform multi-modal root-cause analysis.',
+    tags: ['In Progress', 'Autonomous Agent', 'Self-Healing Locators', 'AI Pipeline']
+  }
+};
+
 const overlay = document.getElementById('modalOverlay');
 const modalClose = document.getElementById('modalClose');
-document.querySelectorAll('.proj-card[data-modal]').forEach(card => {
-  card.addEventListener('click', () => overlay.classList.add('show'));
+
+document.querySelectorAll('.proj-card[data-project]').forEach(card => {
+  card.addEventListener('click', () => {
+    const pKey = card.getAttribute('data-project');
+    const data = projectData[pKey];
+    if (data && overlay) {
+      const barSpan = overlay.querySelector('.modal-bar .mono');
+      const bodyH3 = overlay.querySelector('.modal-body h3');
+      const bodyP = overlay.querySelector('.modal-body p');
+      const tagRow = overlay.querySelector('.modal-body .tag-row');
+      
+      if (barSpan) barSpan.textContent = data.file;
+      if (bodyH3) bodyH3.textContent = data.title;
+      if (bodyP) bodyP.textContent = data.body;
+      if (tagRow) {
+        tagRow.innerHTML = data.tags.map(t => `<span class="tag">${t}</span>`).join('');
+      }
+    }
+    overlay.classList.add('show');
+  });
 });
+
 function closeModal() { overlay.classList.remove('show'); }
-modalClose.addEventListener('click', closeModal);
-overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+if (modalClose) modalClose.addEventListener('click', closeModal);
+if (overlay) overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && overlay) closeModal(); });
 
 /* ============================================================
    12. Blur-in reveal for skills big-tile lines (distinct from
@@ -665,3 +773,122 @@ if (illusTile) {
     }
   });
 }
+
+/* ============================================================
+   Assistant Widget: Sleek AI Launcher & Fixed Chat Panel
+   ============================================================ */
+const fabHolder = document.getElementById('fabHolder');
+const fab = document.getElementById('assistantFab');
+const tooltip = document.getElementById('fabTooltip');
+const panelFrame = document.getElementById('panelFrame');
+const apCloseBtn = document.getElementById('apClose');
+const apBody = document.getElementById('apBody');
+const apInput = document.getElementById('apInput');
+const apSendBtn = document.getElementById('apSend');
+const apSuggestions = document.getElementById('apSuggestions');
+
+if (fabHolder && fab && panelFrame) {
+  // Show tooltip on hover only when closed
+  fabHolder.addEventListener('mouseenter', () => {
+    if (!panelFrame.classList.contains('open') && tooltip) {
+      tooltip.classList.add('show');
+    }
+  });
+
+  fabHolder.addEventListener('mouseleave', () => {
+    if (tooltip) tooltip.classList.remove('show');
+  });
+
+  function openPanel() {
+    panelFrame.classList.add('open');
+    fab.classList.add('is-open');
+    if (tooltip) tooltip.classList.remove('show');
+    setTimeout(() => {
+      if (apInput) apInput.focus();
+    }, 280);
+  }
+
+  function closePanel() {
+    panelFrame.classList.remove('open');
+    fab.classList.remove('is-open');
+  }
+
+  fab.addEventListener('click', () => {
+    panelFrame.classList.contains('open') ? closePanel() : openPanel();
+  });
+
+  if (apCloseBtn) {
+    apCloseBtn.addEventListener('click', closePanel);
+  }
+
+  // Close on Escape key
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && panelFrame.classList.contains('open')) {
+      closePanel();
+    }
+  });
+
+  function addMsg(text, who) {
+    const div = document.createElement('div');
+    div.className = 'msg ' + who;
+    div.textContent = text;
+    if (apBody) {
+      apBody.appendChild(div);
+      apBody.scrollTop = apBody.scrollHeight;
+    }
+    return div;
+  }
+
+  function showTyping() {
+    const t = document.createElement('div');
+    t.className = 'typing';
+    t.id = 'typingIndicator';
+    t.innerHTML = '<i></i><i></i><i></i>';
+    if (apBody) {
+      apBody.appendChild(t);
+      apBody.scrollTop = apBody.scrollHeight;
+    }
+  }
+
+  function hideTyping() {
+    const t = document.getElementById('typingIndicator');
+    if (t) t.remove();
+  }
+
+  function handleAsk(text) {
+    if (!text || !text.trim()) return;
+    addMsg(text, 'user');
+    if (apInput) apInput.value = '';
+    showTyping();
+    setTimeout(() => {
+      hideTyping();
+      addMsg("This is a UI preview — once the API is connected, I'll answer this for real.", 'bot');
+    }, 850);
+  }
+
+  if (apSuggestions) {
+    apSuggestions.addEventListener('click', e => {
+      const chip = e.target.closest('.chip');
+      if (!chip || chip.classList.contains('chip-disabled')) return;
+      handleAsk(chip.dataset.q);
+      apSuggestions.querySelectorAll('.chip').forEach(c => {
+        c.classList.add('chip-disabled');
+        if (c === chip) c.classList.add('chip-picked');
+      });
+    });
+  }
+
+  if (apSendBtn) {
+    apSendBtn.addEventListener('click', () => {
+      if (apInput) handleAsk(apInput.value);
+    });
+  }
+
+  if (apInput) {
+    apInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') handleAsk(apInput.value);
+    });
+  }
+}
+
+
