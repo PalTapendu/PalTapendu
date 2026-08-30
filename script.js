@@ -1033,14 +1033,21 @@ if (fabHolder && fab && panelFrame) {
   }
 
   if (apSendBtn) {
-    apSendBtn.addEventListener('click', () => {
-      if (apInput) handleAsk(apInput.value);
+    apSendBtn.addEventListener('click', e => {
+      e.preventDefault();
+      if (apInput) {
+        handleAsk(apInput.value);
+        apInput.focus();
+      }
     });
   }
 
   if (apInput) {
     apInput.addEventListener('keydown', e => {
-      if (e.key === 'Enter') handleAsk(apInput.value);
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleAsk(apInput.value);
+      }
     });
   }
 }
