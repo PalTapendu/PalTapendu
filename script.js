@@ -859,15 +859,95 @@ if (fabHolder && fab && panelFrame) {
     if (t) t.remove();
   }
 
-  function handleAsk(text) {
+  // ── Conversation history ────────────────────────────────────────────────
+  // Keeps the running message log in the format Groq expects.
+  // The system message is added server-side in api/chat.js — not here.
+  const conversationHistory = [];
+
+  // ── Live page context scraper ────────────────────────────────────────────
+  // Called fresh on every send so the AI always sees the latest DOM content.
+  // Never caches — if Tapendu updates his portfolio, the AI reflects it automatically.
+  function gatherPageContext() {
+    const sectionMap = [
+      { id: 'about',      label: 'About' },
+      { id: 'skills',     label: 'Skills' },
+      { id: 'projects',   label: 'Projects' },
+      { id: 'experience', label: 'Experience' },
+      { id: 'education',  label: 'Education' },
+      { id: 'contact',    label: 'Contact' },
+    ];
+
+    return sectionMap
+      .map(({ id, label }) => {
+        const el = document.getElementById(id);
+        if (!el) return null;
+        // Collapse repeated whitespace/newlines to single spaces/newlines for cleaner context
+        const raw = (el.innerText || el.textContent || '').trim();
+        const cleaned = raw.replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n');
+        return `${label}:\n${cleaned}`;
+      })
+      .filter(Boolean)
+      .join('\n\n---\n\n');
+  }
+
+  // ── Real AI send handler ─────────────────────────────────────────────────
+  async function handleAsk(text) {
     if (!text || !text.trim()) return;
-    addMsg(text, 'user');
+    const trimmed = text.trim();
+
+    // 1. Display user message and clear input
+    addMsg(trimmed, 'user');
     if (apInput) apInput.value = '';
+
+    // 2. Add to history BEFORE the fetch so the full history goes to the API
+    conversationHistory.push({ role: 'user', content: trimmed });
+
+    // 3. Show typing indicator while waiting
     showTyping();
-    setTimeout(() => {
+
+    // 4. Gather fresh page context right now
+    const pageContext = gatherPageContext();
+
+    // 5. Call the Vercel serverless function
+    try {
+      const response = await fetch('https://pal-tapendu.vercel.app/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: conversationHistory,
+          pageContext,
+        }),
+      });
+
       hideTyping();
-      addMsg("This is a UI preview — once the API is connected, I'll answer this for real.", 'bot');
-    }, 850);
+
+      if (!response.ok) {
+        // Try to read a structured error from the server
+        let errMsg = 'Sorry, I\'m having trouble connecting right now — please try again in a moment.';
+        try {
+          const errData = await response.json();
+          if (errData && errData.error) errMsg = errData.error;
+        } catch (_) { /* use fallback */ }
+        addMsg(errMsg, 'bot');
+        // Remove the user message we just added from history so the context stays clean
+        conversationHistory.pop();
+        return;
+      }
+
+      const data = await response.json();
+      const reply = data.reply || 'I received an empty response — please try again.';
+
+      // 6. Add assistant reply to history and display it
+      conversationHistory.push({ role: 'assistant', content: reply });
+      addMsg(reply, 'bot');
+
+    } catch (networkError) {
+      // Network failure (offline, DNS, CORS issue, etc.)
+      hideTyping();
+      addMsg('Sorry, I\'m having trouble connecting right now — please try again in a moment.', 'bot');
+      // Roll back the user message from history so next attempt is clean
+      conversationHistory.pop();
+    }
   }
 
   if (apSuggestions) {
