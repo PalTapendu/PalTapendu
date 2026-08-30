@@ -859,10 +859,79 @@ if (fabHolder && fab && panelFrame) {
     if (t) t.remove();
   }
 
+  // ── localStorage persistence ─────────────────────────────────────────────
+  // Saves the conversation with a sliding 24-hour expiry window.
+  // All access is wrapped in try/catch — if storage is unavailable
+  // (e.g. private/incognito mode with strict settings) the widget
+  // simply behaves as it does without persistence; no errors surface.
+  const STORAGE_KEY = 'tapendu_chat_history';
+  const EXPIRY_MS   = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+
+  function saveChat() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        messages: conversationHistory,
+        lastActivity: Date.now(),
+      }));
+    } catch (_) { /* storage unavailable — silently ignore */ }
+  }
+
+  function loadChat() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (
+        !parsed ||
+        !Array.isArray(parsed.messages) ||
+        parsed.messages.length === 0 ||
+        typeof parsed.lastActivity !== 'number' ||
+        Date.now() - parsed.lastActivity >= EXPIRY_MS
+      ) {
+        // Expired or malformed — remove and treat as fresh session
+        localStorage.removeItem(STORAGE_KEY);
+        return null;
+      }
+      return parsed.messages;
+    } catch (_) {
+      return null; // storage unavailable or JSON corrupt — start fresh
+    }
+  }
+
   // ── Conversation history ────────────────────────────────────────────────
   // Keeps the running message log in the format Groq expects.
   // The system message is added server-side in api/chat.js — not here.
   const conversationHistory = [];
+
+  // ── Restore saved conversation on page load ──────────────────────────────
+  // Runs once, immediately. Checks localStorage for a valid session
+  // (within the 24-hour window) and, if found, re-renders the saved
+  // messages as plain bubbles (no typing animation — instant restore).
+  // If no valid session exists, the default welcome message and suggestion
+  // chips that are already in the HTML remain untouched.
+  (function restoreSession() {
+    const saved = loadChat();
+    if (!saved) return; // no valid session — keep the welcome message & chips
+
+    // A prior conversation exists — clear the default welcome content
+    // (the static welcome bubble + suggestion chips baked into the HTML)
+    // and re-render the saved messages in order.
+    if (apBody) {
+      apBody.innerHTML = '';
+      saved.forEach(msg => {
+        const who = msg.role === 'user' ? 'user' : 'bot';
+        addMsg(msg.content, who);
+      });
+    }
+
+    // Restore the in-memory history so new messages continue the thread
+    conversationHistory.push(...saved);
+
+    // Hide suggestion chips — they're meaningless mid-conversation.
+    // The chip container is inside apBody (already cleared above),
+    // but guard in case DOM structure ever changes.
+    if (apSuggestions) apSuggestions.style.display = 'none';
+  })();
 
   // ── Live page context scraper ────────────────────────────────────────────
   // Called fresh on every send so the AI always sees the latest DOM content.
@@ -937,9 +1006,10 @@ if (fabHolder && fab && panelFrame) {
       const data = await response.json();
       const reply = data.reply || 'I received an empty response — please try again.';
 
-      // 6. Add assistant reply to history and display it
+      // 6. Add assistant reply to history, display it, and persist both turns
       conversationHistory.push({ role: 'assistant', content: reply });
       addMsg(reply, 'bot');
+      saveChat(); // persist user + assistant turn together after a successful round-trip
 
     } catch (networkError) {
       // Network failure (offline, DNS, CORS issue, etc.)
