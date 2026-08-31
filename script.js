@@ -1210,12 +1210,68 @@ function startNotifyFlow() {
       }
 
       const data = await response.json();
-      const reply = data.reply || 'I received an empty response — please try again.';
+      const rawReply = data.reply || 'I received an empty response — please try again.';
 
-      // 6. Add assistant reply to history, display it, and persist both turns
-      conversationHistory.push({ role: 'assistant', content: reply });
-      addMsg(reply, 'bot');
+      // ── [[NOTIFY_OFFER]] marker detection ─────────────────────────────────
+      // The model appends this invisible token when it cannot answer from page
+      // content. Strip it from the displayed text and, if present, surface a
+      // Yes/No offer beneath the bubble. The visitor never sees the raw marker.
+      const NOTIFY_MARKER = '[[NOTIFY_OFFER]]';
+      const hasOffer = rawReply.replace(/\s+$/, '').endsWith(NOTIFY_MARKER);
+      const cleanReply = hasOffer
+        ? rawReply.replace(/\s*\[\[NOTIFY_OFFER\]\]\s*$/, '').trimEnd()
+        : rawReply;
+
+      // 6. Add assistant reply to history (store clean text, not the marker)
+      conversationHistory.push({ role: 'assistant', content: cleanReply });
+      const replyBubble = addMsg(cleanReply, 'bot');
       saveChat(); // persist user + assistant turn together after a successful round-trip
+
+      // 7. If the model offered to notify Tapendu, render Yes/No buttons
+      if (hasOffer && replyBubble) {
+        const offerRow = document.createElement('div');
+        offerRow.className = 'notify-offer-row';
+
+        const yesBtn = document.createElement('button');
+        yesBtn.textContent = 'Yes, let him know';
+        yesBtn.className = 'notify-offer-btn notify-offer-yes';
+        yesBtn.type = 'button';
+
+        const noBtn = document.createElement('button');
+        noBtn.textContent = 'No thanks';
+        noBtn.className = 'notify-offer-btn notify-offer-no';
+        noBtn.type = 'button';
+
+        // Shared lock: once either button is clicked, disable both permanently
+        function lockOfferButtons() {
+          yesBtn.disabled = true;
+          noBtn.disabled = true;
+          yesBtn.style.opacity = '0.38';
+          noBtn.style.opacity = '0.38';
+          yesBtn.style.pointerEvents = 'none';
+          noBtn.style.pointerEvents = 'none';
+        }
+
+        yesBtn.addEventListener('click', () => {
+          lockOfferButtons();
+          startNotifyFlow(); // same function as About button and chip — zero duplication
+        });
+
+        noBtn.addEventListener('click', () => {
+          lockOfferButtons();
+          // chatMode stays 'normal' — next message is a regular Groq query
+        });
+
+        offerRow.appendChild(yesBtn);
+        offerRow.appendChild(noBtn);
+
+        // Insert immediately after the reply bubble
+        if (replyBubble.parentNode) {
+          replyBubble.parentNode.insertBefore(offerRow, replyBubble.nextSibling);
+          const apBodyEl = document.getElementById('apBody');
+          if (apBodyEl) apBodyEl.scrollTop = apBodyEl.scrollHeight;
+        }
+      }
 
     } catch (networkError) {
       // Network failure (offline, DNS, CORS issue, etc.)

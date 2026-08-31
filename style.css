@@ -3102,6 +3102,48 @@ body.chat-is-open #fabHolder {
   cursor: default;
 }
 
+/* ── Notify-offer Yes/No button row (AI's proactive offer when it can't answer) */
+.notify-offer-row {
+  display: flex;
+  gap: 8px;
+  margin: 7px 0 2px 4px;
+  flex-wrap: wrap;
+}
+
+.notify-offer-btn {
+  padding: 5px 14px;
+  font-size: 11.5px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 500;
+  border-radius: 100px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease, opacity .15s ease;
+  pointer-events: auto;
+}
+
+.notify-offer-yes {
+  background: rgba(201, 162, 75, 0.15);
+  border-color: rgba(201, 162, 75, 0.5);
+  color: var(--brass-soft);
+}
+
+.notify-offer-yes:hover {
+  background: rgba(201, 162, 75, 0.25);
+  border-color: var(--brass);
+}
+
+.notify-offer-no {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.notify-offer-no:hover {
+  border-color: rgba(255, 255, 255, 0.28);
+  color: rgba(255, 255, 255, 0.75);
+}
+
 @media (max-width: 480px) {
   #panelFrame {
     right: 12px;
