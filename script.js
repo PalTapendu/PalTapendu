@@ -890,6 +890,10 @@ function startNotifyFlow() {
   if (panelFrame && !panelFrame.classList.contains('open')) {
     openPanel();
   }
+  // Hide suggestion chips immediately — the notify flow's first question
+  // replaces the chip menu entirely, whether panel was already open or not.
+  const chipsEl = document.getElementById('apSuggestions');
+  if (chipsEl) chipsEl.style.display = 'none';
   addMsg(
     "Sure! What's your name, and how can Tapendu best reach you back afterwards (email, phone, LinkedIn — whatever you prefer)?",
     'bot'
@@ -1259,6 +1263,10 @@ function startNotifyFlow() {
 
         noBtn.addEventListener('click', () => {
           lockOfferButtons();
+          addMsg(
+            "No problem! Thanks for stopping by — feel free to ask me anything else.",
+            'bot'
+          );
           // chatMode stays 'normal' — next message is a regular Groq query
         });
 
