@@ -787,35 +787,41 @@ const apInput = document.getElementById('apInput');
 const apSendBtn = document.getElementById('apSend');
 const apSuggestions = document.getElementById('apSuggestions');
 
+// ── Panel open / close helpers (outer scope so pingBtn can reach them) ─────
+function openPanel() {
+  if (!panelFrame) return;
+  panelFrame.classList.add('open');
+  if (fab) fab.classList.add('is-open');
+  document.body.classList.add('chat-is-open');
+  const tooltip = document.getElementById('fabTooltip');
+  if (tooltip) tooltip.classList.remove('show');
+  const toTopEl = document.getElementById('toTop');
+  if (toTopEl) toTopEl.classList.add('chat-left-shift');
+  setTimeout(() => { if (apInput) apInput.focus(); }, 280);
+}
+
+function closePanel() {
+  if (!panelFrame) return;
+  panelFrame.classList.remove('open');
+  if (fab) fab.classList.remove('is-open');
+  document.body.classList.remove('chat-is-open');
+  const toTopEl = document.getElementById('toTop');
+  if (toTopEl) toTopEl.classList.remove('chat-left-shift');
+}
+
 if (fabHolder && fab && panelFrame) {
   // Show tooltip on hover only when closed
   fabHolder.addEventListener('mouseenter', () => {
+    const tooltip = document.getElementById('fabTooltip');
     if (!panelFrame.classList.contains('open') && tooltip) {
       tooltip.classList.add('show');
     }
   });
 
   fabHolder.addEventListener('mouseleave', () => {
+    const tooltip = document.getElementById('fabTooltip');
     if (tooltip) tooltip.classList.remove('show');
   });
-
-  function openPanel() {
-    panelFrame.classList.add('open');
-    fab.classList.add('is-open');
-    document.body.classList.add('chat-is-open');
-    if (tooltip) tooltip.classList.remove('show');
-    if (toTop) toTop.classList.add('chat-left-shift');
-    setTimeout(() => {
-      if (apInput) apInput.focus();
-    }, 280);
-  }
-
-  function closePanel() {
-    panelFrame.classList.remove('open');
-    fab.classList.remove('is-open');
-    document.body.classList.remove('chat-is-open');
-    if (toTop) toTop.classList.remove('chat-left-shift');
-  }
 
   fab.addEventListener('click', () => {
     panelFrame.classList.contains('open') ? closePanel() : openPanel();
@@ -832,34 +838,65 @@ if (fabHolder && fab && panelFrame) {
     }
   });
 
-  function addMsg(text, who) {
-    const div = document.createElement('div');
-    div.className = 'msg ' + who;
-    div.textContent = text;
-    if (apBody) {
-      apBody.appendChild(div);
-      apBody.scrollTop = apBody.scrollHeight;
-    }
-    return div;
+// ── Chat bubble helpers (outer scope — used by both widget and notify flow) ──
+function addMsg(text, who) {
+  const div = document.createElement('div');
+  div.className = 'msg ' + who;
+  div.textContent = text;
+  const apBodyEl = document.getElementById('apBody');
+  if (apBodyEl) {
+    apBodyEl.appendChild(div);
+    apBodyEl.scrollTop = apBodyEl.scrollHeight;
   }
+  return div;
+}
 
-  function showTyping() {
-    const t = document.createElement('div');
-    t.className = 'typing';
-    t.id = 'typingIndicator';
-    t.innerHTML = '<i></i><i></i><i></i>';
-    if (apBody) {
-      apBody.appendChild(t);
-      apBody.scrollTop = apBody.scrollHeight;
-    }
+function showTyping() {
+  const t = document.createElement('div');
+  t.className = 'typing';
+  t.id = 'typingIndicator';
+  t.innerHTML = '<i></i><i></i><i></i>';
+  const apBodyEl = document.getElementById('apBody');
+  if (apBodyEl) {
+    apBodyEl.appendChild(t);
+    apBodyEl.scrollTop = apBodyEl.scrollHeight;
   }
+}
 
-  function hideTyping() {
-    const t = document.getElementById('typingIndicator');
-    if (t) t.remove();
+function hideTyping() {
+  const t = document.getElementById('typingIndicator');
+  if (t) t.remove();
+}
+
+// ── Notify-flow state (outer scope so pingBtn and startNotifyFlow share it) ──
+// chatMode controls how handleAsk() dispatches each incoming message.
+// 'normal'                 → send to Groq as usual
+// 'awaiting_contact'       → step 1 of notify flow (first attempt)
+// 'awaiting_contact_retry' → step 1 retry (no contact detected first time)
+// 'awaiting_purpose'       → step 2 of notify flow
+// 'awaiting_submit'        → waiting for Part 2 submission logic
+let chatMode = 'normal';
+
+// Holds the visitor data collected during the notify flow.
+// Reset at the start of every new flow invocation.
+let notifyData = { name: '', contact: '', purpose: '' };
+
+// ── startNotifyFlow() ─────────────────────────────────────────────────────
+// Public entry point — call from any trigger (button, chip, or future AI
+// offer). Resets state, opens the panel if needed, and asks step 1.
+function startNotifyFlow() {
+  notifyData = { name: '', contact: '', purpose: '' };
+  chatMode = 'awaiting_contact';
+  if (panelFrame && !panelFrame.classList.contains('open')) {
+    openPanel();
   }
+  addMsg(
+    "Sure! What's your name, and how can Tapendu best reach you back afterwards (email, phone, LinkedIn — whatever you prefer)?",
+    'bot'
+  );
+}
 
-  // ── localStorage persistence ─────────────────────────────────────────────
+
   // Saves the conversation with a sliding 24-hour expiry window.
   // All access is wrapped in try/catch — if storage is unavailable
   // (e.g. private/incognito mode with strict settings) the widget
@@ -959,6 +996,92 @@ if (fabHolder && fab && panelFrame) {
       .join('\n\n---\n\n');
   }
 
+
+  // ── checkHasContact(text) → Promise<boolean> ──────────────────────────────
+  // Uses the Groq backend (a silent, invisible API call — not added to
+  // conversationHistory, not shown as a bubble) to check whether the visitor's
+  // reply contains any recognisable point of contact.
+  async function checkHasContact(text) {
+    try {
+      const resp = await fetch('https://pal-tapendu.vercel.app/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [
+            {
+              role: 'user',
+              content:
+                'Does the following text contain any point of contact such as an email address, ' +
+                'phone number, or a social/LinkedIn profile link? ' +
+                'Reply with only the single word YES or NO, nothing else. ' +
+                'Text: "' + text + '"',
+            },
+          ],
+          // Minimal context — we only need a YES/NO classification
+          pageContext: '',
+        }),
+      });
+      if (!resp.ok) return false;
+      const data = await resp.json();
+      const answer = (data.reply || '').trim().toUpperCase();
+      return answer.startsWith('YES');
+    } catch (_) {
+      // If the check itself fails, treat as no-contact so we don't block the flow
+      return false;
+    }
+  }
+
+  // ── handleNotifyReply(trimmed) ────────────────────────────────────────────
+  // Processes a visitor message when chatMode is anything other than 'normal'.
+  // Called from handleAsk() BEFORE any Groq/AI call.
+  async function handleNotifyReply(trimmed) {
+    if (chatMode === 'awaiting_contact' || chatMode === 'awaiting_contact_retry') {
+      const isRetry = (chatMode === 'awaiting_contact_retry');
+
+      // Show typing while we do the silent contact-check
+      showTyping();
+      const hasContact = await checkHasContact(trimmed);
+      hideTyping();
+
+      if (hasContact) {
+        // Store name + contact (full reply — fine to keep together)
+        notifyData.contact = trimmed;
+        // Best-effort name extraction: if text has a comma, take the part before it
+        const commaSplit = trimmed.split(',');
+        notifyData.name = commaSplit.length > 1 ? commaSplit[0].trim() : trimmed.trim();
+
+        chatMode = 'awaiting_purpose';
+        addMsg("Thanks! Lastly, what would you like to reach out about?", 'bot');
+
+      } else if (!isRetry) {
+        // First attempt — no contact found: store best-guess name, ask again
+        notifyData.name = trimmed.trim();
+        chatMode = 'awaiting_contact_retry';
+        addMsg(
+          "I didn't quite catch a way to reach you back — could you add an email or phone number? For example: phone 1234567890 or email abc@gmail.com.",
+          'bot'
+        );
+
+      } else {
+        // Second attempt (retry) — still no contact: accept whatever they have and move on
+        notifyData.contact = trimmed.trim() || 'Not provided';
+        chatMode = 'awaiting_purpose';
+        addMsg("Thanks! Lastly, what would you like to reach out about?", 'bot');
+      }
+
+    } else if (chatMode === 'awaiting_purpose') {
+      notifyData.purpose = trimmed;
+      chatMode = 'awaiting_submit';
+      // Placeholder — Part 2 will replace this with the real Web3Forms submission
+      addMsg("Got it, sending this to Tapendu now...", 'bot');
+      // TODO: next part will submit notifyData here
+
+    } else {
+      // Unrecognised mode — reset to normal so the widget never gets stuck
+      chatMode = 'normal';
+    }
+  }
+
   // ── Real AI send handler ─────────────────────────────────────────────────
   async function handleAsk(text) {
     if (!text || !text.trim()) return;
@@ -968,13 +1091,22 @@ if (fabHolder && fab && panelFrame) {
     addMsg(trimmed, 'user');
     if (apInput) apInput.value = '';
 
-    // 2. Add to history BEFORE the fetch so the full history goes to the API
+    // 2. DISPATCH: if a notify flow is active, intercept and handle locally.
+    //    Do NOT add to conversationHistory and do NOT call Groq.
+    if (chatMode !== 'normal') {
+      await handleNotifyReply(trimmed);
+      return;
+    }
+
+    // --- From here: normal Groq-powered AI flow ---
+
+    // 3. Add to history BEFORE the fetch so the full history goes to the API
     conversationHistory.push({ role: 'user', content: trimmed });
 
-    // 3. Show typing indicator while waiting
+    // 4. Show typing indicator while waiting
     showTyping();
 
-    // 4. Gather fresh page context right now
+    // 5. Gather fresh page context right now
     const pageContext = gatherPageContext();
 
     // 5. Call the Vercel serverless function
@@ -1024,11 +1156,19 @@ if (fabHolder && fab && panelFrame) {
     apSuggestions.addEventListener('click', e => {
       const chip = e.target.closest('.chip');
       if (!chip || chip.classList.contains('chip-disabled')) return;
-      handleAsk(chip.dataset.q);
+
+      // Disable all chips immediately (visual feedback)
       apSuggestions.querySelectorAll('.chip').forEach(c => {
         c.classList.add('chip-disabled');
         if (c === chip) c.classList.add('chip-picked');
       });
+
+      if (chip.dataset.notify === 'true') {
+        // Third chip: start the notify flow instead of a normal AI query
+        startNotifyFlow();
+      } else {
+        handleAsk(chip.dataset.q);
+      }
     });
   }
 
@@ -1052,4 +1192,11 @@ if (fabHolder && fab && panelFrame) {
   }
 }
 
-
+// ── "Ping me personally" button in the About section ─────────────────────────
+// startNotifyFlow() and openPanel() are in outer scope, so this works directly.
+const pingBtn = document.getElementById('pingBtn');
+if (pingBtn) {
+  pingBtn.addEventListener('click', () => {
+    startNotifyFlow();
+  });
+}
