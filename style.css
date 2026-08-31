@@ -3076,6 +3076,32 @@ body.chat-is-open #fabHolder {
   pointer-events: none;
 }
 
+/* ── "How it works" inline button (beneath notify success confirmation) ──── */
+.how-it-works-btn {
+  display: block;
+  margin: 6px 0 2px 4px;
+  padding: 5px 13px;
+  font-size: 11.5px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 500;
+  color: var(--brass-soft);
+  background: transparent;
+  border: 1px solid rgba(201, 162, 75, 0.35);
+  border-radius: 100px;
+  cursor: pointer;
+  transition: border-color .15s ease, background .15s ease, opacity .15s ease;
+  pointer-events: auto;
+}
+
+.how-it-works-btn:hover {
+  border-color: var(--brass);
+  background: rgba(201, 162, 75, 0.08);
+}
+
+.how-it-works-btn:disabled {
+  cursor: default;
+}
+
 @media (max-width: 480px) {
   #panelFrame {
     right: 12px;

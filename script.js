@@ -1072,9 +1072,83 @@ function startNotifyFlow() {
     } else if (chatMode === 'awaiting_purpose') {
       notifyData.purpose = trimmed;
       chatMode = 'awaiting_submit';
-      // Placeholder — Part 2 will replace this with the real Web3Forms submission
-      addMsg("Got it, sending this to Tapendu now...", 'bot');
-      // TODO: next part will submit notifyData here
+
+      // ── Submit to Web3Forms directly from the browser ────────────────────
+      // Web3Forms' official approach: client-side fetch is fully supported and
+      // their access key is safe to expose (submission-only, not a secret).
+      // Server-to-server calls (like Vercel → W3F) are blocked by Cloudflare.
+      showTyping();
+
+      try {
+        const w3fResp = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: JSON.stringify({
+            access_key:  '0f94455f-0cd1-41c2-a14a-2003675beb72',
+            name:    notifyData.name    || 'Unknown',
+            contact: notifyData.contact || 'Not provided',
+            message: notifyData.purpose,
+          }),
+        });
+
+        hideTyping();
+        chatMode = 'normal'; // Reset regardless of outcome
+
+        let succeeded = false;
+        if (w3fResp.ok) {
+          try {
+            const w3fData = await w3fResp.json();
+            succeeded = w3fData.success === true;
+          } catch (_) { /* treat parse failure as no success */ }
+        }
+
+        if (succeeded) {
+          // ── Success path ───────────────────────────────────────────────────
+          const confirmBubble = addMsg(
+            "Done! I've sent this over to Tapendu — he'll reach out to you directly.",
+            'bot'
+          );
+
+          // Append a small "How it works" button beneath this bubble only
+          const howBtn = document.createElement('button');
+          howBtn.textContent = 'How it works';
+          howBtn.className = 'how-it-works-btn';
+          howBtn.type = 'button';
+          // Independent click handler: never touches chatMode or the notify flow
+          howBtn.addEventListener('click', () => {
+            howBtn.disabled = true;
+            howBtn.style.opacity = '0.45';
+            addMsg(
+              "This sends a one-time notification email straight to Tapendu with your name, contact info, and message. There's no live chat here — once he sees it, he'll personally get back to you by email.",
+              'bot'
+            );
+          });
+          if (confirmBubble && confirmBubble.parentNode) {
+            confirmBubble.parentNode.insertBefore(howBtn, confirmBubble.nextSibling);
+            const apBodyEl = document.getElementById('apBody');
+            if (apBodyEl) apBodyEl.scrollTop = apBodyEl.scrollHeight;
+          }
+
+        } else {
+          // ── Failure path ───────────────────────────────────────────────────
+          addMsg(
+            "Hmm, something went wrong sending that. Please try again in a moment, or feel free to email Tapendu directly.",
+            'bot'
+          );
+        }
+
+      } catch (networkErr) {
+        // Network error (offline, DNS, etc.)
+        hideTyping();
+        chatMode = 'normal';
+        addMsg(
+          "Hmm, something went wrong sending that. Please try again in a moment, or feel free to email Tapendu directly.",
+          'bot'
+        );
+      }
 
     } else {
       // Unrecognised mode — reset to normal so the widget never gets stuck
