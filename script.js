@@ -877,6 +877,15 @@ function hideTyping() {
 // 'awaiting_submit'        → waiting for Part 2 submission logic
 let chatMode = 'normal';
 
+// Shown when a fetch() call throws before any HTTP response is received
+// (request blocked by browser extension, firewall, or restricted network).
+// Distinct from server-side errors where a response was actually received.
+const MSG_BLOCKED =
+  "It looks like your browser, network, or a security/ad-blocker extension might be blocking this connection " +
+  "\u2014 this sometimes happens on company or restricted networks. Try a different network, briefly disable any " +
+  "ad-blocker or security extension, or check back later. If it continues, feel free to reach out to Tapendu " +
+  "directly through the Contact section.";
+
 // Holds the visitor data collected during the notify flow.
 // Reset at the start of every new flow invocation.
 let notifyData = { name: '', contact: '', purpose: '' };
@@ -1145,13 +1154,11 @@ function startNotifyFlow() {
         }
 
       } catch (networkErr) {
-        // Network error (offline, DNS, etc.)
+        // fetch() threw before any HTTP response was received — likely blocked
+        // by a browser extension, firewall, or restrictive network (Case A).
         hideTyping();
         chatMode = 'normal';
-        addMsg(
-          "Hmm, something went wrong sending that. Please try again in a moment, or feel free to email Tapendu directly.",
-          'bot'
-        );
+        addMsg(MSG_BLOCKED, 'bot');
       }
 
     } else {
@@ -1282,9 +1289,12 @@ function startNotifyFlow() {
       }
 
     } catch (networkError) {
-      // Network failure (offline, DNS, CORS issue, etc.)
+      // fetch() threw before any HTTP response was received — likely blocked
+      // by a browser extension, firewall, or restrictive network (Case A).
+      // This is distinct from !response.ok above (Case B: server was reached
+      // but returned an error) which keeps its own neutral retry message.
       hideTyping();
-      addMsg('Sorry, I\'m having trouble connecting right now — please try again in a moment.', 'bot');
+      addMsg(MSG_BLOCKED, 'bot');
       // Roll back the user message from history so next attempt is clean
       conversationHistory.pop();
     }
