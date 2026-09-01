@@ -6,7 +6,7 @@
 - **Full Name**: Tapendu Pal
 - **Alternative Names**: Pal Tapendu, PalTapendu, Tapendu
 - **Current Role**: Program Analyst — Automation Test Engineer (SDET)
-- **Current Company**: Cognizant Technology Solutions (2.5+ years of enterprise experience)
+- **Current Company**: Cognizant Technology Solutions (Enterprise QA & AI Automation)
 - **Primary Domain**: Software Engineering, Automated Quality Assurance (QA), Applied AI Engineering, Enterprise Automation
 - **Location**: Hooghly, West Bengal, India
 - **Education**: Bachelor of Technology (B.Tech) in Computer Science & Engineering — Guru Nanak Institute of Technology (2019 – 2023)
@@ -16,7 +16,7 @@
 - **Contact Email**: tapendupal122@gmail.com
 
 ## Professional Background & Expertise
-Tapendu Pal is an experienced software engineer and automation specialist with over 2.5 years of industry experience at Cognizant (Joined June 6, 2024 as Program Analyst on US-based client projects). He specializes in designing, prototyping, and deploying enterprise-grade test automation frameworks and applied AI solutions.
+Tapendu Pal is an experienced software engineer and automation specialist with enterprise industry experience at Cognizant (Joined June 6, 2024 as Program Analyst on US-based client projects). He specializes in designing, prototyping, and deploying enterprise-grade test automation frameworks and applied AI solutions.
 
 ### Core Technical Skills:
 - **Test Automation Frameworks**: Selenium WebDriver, Playwright, TestNG, JUnit, Cucumber BDD

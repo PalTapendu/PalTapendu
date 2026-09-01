@@ -196,11 +196,48 @@ if (heroHeadline) {
 }
 
 /* ============================================================
+   SHARED EXPERIENCE / TENURE CONFIGURATION & CALCULATOR
+   ============================================================ */
+// Start Date: June 6, 2024 (Cognizant Technology Solutions)
+const COGNIZANT_JOIN_DATE = new Date(2024, 5, 6, 0, 0, 0); // June 6, 2024
+
+function getHeroExperienceStat(startDate = COGNIZANT_JOIN_DATE, now = new Date()) {
+  let years = now.getFullYear() - startDate.getFullYear();
+  let months = now.getMonth() - startDate.getMonth();
+  let days = now.getDate() - startDate.getDate();
+
+  if (days < 0) {
+    months -= 1;
+  }
+  if (months < 0) {
+    years -= 1;
+    months += 12;
+  }
+
+  const fullMonthsElapsed = Math.max(0, years * 12 + months);
+  const rawValue = Math.floor(fullMonthsElapsed / 6) * 0.5;
+  const value = rawValue < 0.5 ? 0.5 : rawValue;
+  const formatted = (value % 1 === 0) ? value.toFixed(0) : value.toFixed(1);
+  const isFloat = (value % 1 !== 0);
+
+  return {
+    value,
+    formatted,
+    isFloat,
+    fullMonthsElapsed,
+    years,
+    months,
+    days
+  };
+}
+
+/* ============================================================
    4. Re-triggering terminal typing animation
    ============================================================ */
+const heroExpStat = getHeroExperienceStat();
 const assertions = [
   "booting autonomous profile...",
-  ["Engineer with 2.5+ years building & testing software at scale"],
+  [`Engineer with ${heroExpStat.formatted}+ years building & testing software at scale`],
   ["Daily AI stack: GitHub Copilot, ChatGPT, Claude 3.7"],
   ["Core expertise: Selenium, Playwright, Enterprise Automation"],
   ["Currently shipping personal AI-powered full-stack projects"],
@@ -266,8 +303,24 @@ new IntersectionObserver((entries) => {
 /* ============================================================
    5. Animated stat counters & Live Dynamic Tenure Engine
    ============================================================ */
-// Real-time dynamic Cognizant experience calculator (Start Date: June 6, 2024)
-const COGNIZANT_JOIN_DATE = new Date(2024, 5, 6, 0, 0, 0); // June 6, 2024
+function initHeroExperienceStat() {
+  const heroExpEl = document.getElementById('heroExpNum');
+  if (!heroExpEl) return;
+
+  const stat = getHeroExperienceStat();
+  if (stat.isFloat) {
+    heroExpEl.removeAttribute('data-count');
+    heroExpEl.setAttribute('data-count-float', stat.formatted);
+    heroExpEl.textContent = '0.0';
+  } else {
+    heroExpEl.removeAttribute('data-count-float');
+    heroExpEl.setAttribute('data-count', stat.formatted);
+    heroExpEl.textContent = '0';
+  }
+}
+
+// Dynamically configure hero experience counter on page load
+initHeroExperienceStat();
 
 function updateLiveCognizantTenure() {
   const now = new Date();
