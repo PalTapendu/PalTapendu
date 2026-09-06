@@ -9,14 +9,22 @@ const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 const GROQ_MODEL = "openai/gpt-oss-120b";
 
 // Allowed origins — add any additional domains you need here.
-const ALLOWED_ORIGIN = "https://paltapendu.github.io";
+const ALLOWED_ORIGINS = [
+  "https://paltapendu.github.io",
+  "https://tapendu.is-a.dev",
+];
 
 /**
- * Sets the CORS response headers required so that the GitHub Pages frontend
+ * Sets the CORS response headers required so that the frontend
  * (cross-origin) can successfully call this Vercel function.
  */
-function setCorsHeaders(res) {
-  res.setHeader("Access-Control-Allow-Origin", ALLOWED_ORIGIN);
+function setCorsHeaders(req, res) {
+  const origin = req?.headers?.origin;
+  const allowedOrigin = ALLOWED_ORIGINS.includes(origin)
+    ? origin
+    : ALLOWED_ORIGINS[0];
+
+  res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader(
     "Access-Control-Allow-Headers",
@@ -29,12 +37,12 @@ export default async function handler(req, res) {
   // Browsers send an OPTIONS request before the actual POST to confirm the
   // server allows cross-origin requests. We must respond 204 immediately.
   if (req.method === "OPTIONS") {
-    setCorsHeaders(res);
+    setCorsHeaders(req, res);
     return res.status(204).end();
   }
 
   // ── Set CORS headers on every response ────────────────────────────────────
-  setCorsHeaders(res);
+  setCorsHeaders(req, res);
 
   // ── Method guard ──────────────────────────────────────────────────────────
   if (req.method !== "POST") {
