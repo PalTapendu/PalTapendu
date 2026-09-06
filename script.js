@@ -839,6 +839,7 @@ const apBody = document.getElementById('apBody');
 const apInput = document.getElementById('apInput');
 const apSendBtn = document.getElementById('apSend');
 const apSuggestions = document.getElementById('apSuggestions');
+const initialApBodyHTML = apBody ? apBody.innerHTML : '';
 
 // ── Panel open / close helpers (outer scope so pingBtn can reach them) ─────
 function openPanel() {
@@ -850,6 +851,8 @@ function openPanel() {
   if (tooltip) tooltip.classList.remove('show');
   const toTopEl = document.getElementById('toTop');
   if (toTopEl) toTopEl.classList.add('chat-left-shift');
+  const apBodyEl = document.getElementById('apBody');
+  if (apBodyEl) apBodyEl.scrollTop = apBodyEl.scrollHeight;
   setTimeout(() => { if (apInput) apInput.focus(); }, 280);
 }
 
@@ -963,12 +966,12 @@ function startNotifyFlow() {
 }
 
 
-  // Saves the conversation with a sliding 24-hour expiry window.
+  // Saves the conversation with a sliding 48-hour expiry window.
   // All access is wrapped in try/catch — if storage is unavailable
   // (e.g. private/incognito mode with strict settings) the widget
   // simply behaves as it does without persistence; no errors surface.
   const STORAGE_KEY = 'tapendu_chat_history';
-  const EXPIRY_MS   = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+  const EXPIRY_MS   = 48 * 60 * 60 * 1000; // 48 hours in milliseconds
 
   function saveChat() {
     try {
@@ -1001,6 +1004,23 @@ function startNotifyFlow() {
     }
   }
 
+  function resetToFreshChat() {
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch (_) { /* storage unavailable — silently ignore */ }
+    conversationHistory.length = 0;
+    chatMode = 'normal';
+    notifyData = { name: '', contact: '', purpose: '' };
+    if (apBody) {
+      apBody.innerHTML = initialApBodyHTML;
+      apBody.scrollTop = 0;
+    }
+    if (apInput) {
+      apInput.value = '';
+      apInput.focus();
+    }
+  }
+
   // ── Conversation history ────────────────────────────────────────────────
   // Keeps the running message log in the format Groq expects.
   // The system message is added server-side in api/chat.js — not here.
@@ -1008,8 +1028,10 @@ function startNotifyFlow() {
 
   // ── Restore saved conversation on page load ──────────────────────────────
   // Runs once, immediately. Checks localStorage for a valid session
-  // (within the 24-hour window) and, if found, re-renders the saved
+  // (within the 48-hour window) and, if found, re-renders the saved
   // messages as plain bubbles (no typing animation — instant restore).
+  // Directly beneath the restored history, appends a fixed prompt asking
+  // whether to resume or start fresh with compact action buttons.
   // If no valid session exists, the default welcome message and suggestion
   // chips that are already in the HTML remain untouched.
   (function restoreSession() {
@@ -1030,10 +1052,52 @@ function startNotifyFlow() {
     // Restore the in-memory history so new messages continue the thread
     conversationHistory.push(...saved);
 
-    // Hide suggestion chips — they're meaningless mid-conversation.
-    // The chip container is inside apBody (already cleared above),
-    // but guard in case DOM structure ever changes.
-    if (apSuggestions) apSuggestions.style.display = 'none';
+    // Append the resume-or-fresh prompt bubble (UI bubble only — not in Groq history)
+    const promptBubble = addMsg(
+      "Would you like to continue our previous conversation, or start a fresh new chat?",
+      'bot'
+    );
+
+    // Directly beneath this specific message, show two compact buttons
+    const resumeRow = document.createElement('div');
+    resumeRow.className = 'notify-offer-row chat-action-row';
+
+    const continueBtn = document.createElement('button');
+    continueBtn.textContent = 'Continue';
+    continueBtn.className = 'notify-offer-btn notify-offer-yes chat-action-btn chat-action-primary chat-resume-btn';
+    continueBtn.type = 'button';
+
+    const freshBtn = document.createElement('button');
+    freshBtn.textContent = 'Start Fresh';
+    freshBtn.className = 'notify-offer-btn notify-offer-no chat-action-btn chat-action-secondary chat-resume-btn';
+    freshBtn.type = 'button';
+
+    function lockResumeButtons() {
+      continueBtn.disabled = true;
+      freshBtn.disabled = true;
+      continueBtn.style.opacity = '0.38';
+      freshBtn.style.opacity = '0.38';
+      continueBtn.style.pointerEvents = 'none';
+      freshBtn.style.pointerEvents = 'none';
+    }
+
+    continueBtn.addEventListener('click', () => {
+      lockResumeButtons();
+      if (apInput) apInput.focus();
+    });
+
+    freshBtn.addEventListener('click', () => {
+      resetToFreshChat();
+    });
+
+    resumeRow.appendChild(continueBtn);
+    resumeRow.appendChild(freshBtn);
+
+    if (promptBubble && promptBubble.parentNode) {
+      promptBubble.parentNode.insertBefore(resumeRow, promptBubble.nextSibling);
+      const apBodyEl = document.getElementById('apBody');
+      if (apBodyEl) apBodyEl.scrollTop = apBodyEl.scrollHeight;
+    }
   })();
 
   // ── Live page context scraper ────────────────────────────────────────────
@@ -1229,6 +1293,13 @@ function startNotifyFlow() {
     addMsg(trimmed, 'user');
     if (apInput) apInput.value = '';
 
+    // Lock any active resume buttons since the visitor is actively continuing
+    document.querySelectorAll('.chat-resume-btn').forEach(btn => {
+      btn.disabled = true;
+      btn.style.opacity = '0.38';
+      btn.style.pointerEvents = 'none';
+    });
+
     // 2. DISPATCH: if a notify flow is active, intercept and handle locally.
     //    Do NOT add to conversationHistory and do NOT call Groq.
     if (chatMode !== 'normal') {
@@ -1294,16 +1365,16 @@ function startNotifyFlow() {
       // 7. If the model offered to notify Tapendu, render Yes/No buttons
       if (hasOffer && replyBubble) {
         const offerRow = document.createElement('div');
-        offerRow.className = 'notify-offer-row';
+        offerRow.className = 'notify-offer-row chat-action-row';
 
         const yesBtn = document.createElement('button');
         yesBtn.textContent = 'Yes, let him know';
-        yesBtn.className = 'notify-offer-btn notify-offer-yes';
+        yesBtn.className = 'notify-offer-btn notify-offer-yes chat-action-btn chat-action-primary';
         yesBtn.type = 'button';
 
         const noBtn = document.createElement('button');
         noBtn.textContent = 'No thanks';
-        noBtn.className = 'notify-offer-btn notify-offer-no';
+        noBtn.className = 'notify-offer-btn notify-offer-no chat-action-btn chat-action-secondary';
         noBtn.type = 'button';
 
         // Shared lock: once either button is clicked, disable both permanently
@@ -1353,13 +1424,14 @@ function startNotifyFlow() {
     }
   }
 
-  if (apSuggestions) {
-    apSuggestions.addEventListener('click', e => {
+  if (apBody) {
+    apBody.addEventListener('click', e => {
       const chip = e.target.closest('.chip');
       if (!chip || chip.classList.contains('chip-disabled')) return;
 
-      // Disable all chips immediately (visual feedback)
-      apSuggestions.querySelectorAll('.chip').forEach(c => {
+      // Disable all chips in current suggestions group (visual feedback)
+      const suggestionsContainer = chip.closest('#apSuggestions') || apBody;
+      suggestionsContainer.querySelectorAll('.chip').forEach(c => {
         c.classList.add('chip-disabled');
         if (c === chip) c.classList.add('chip-picked');
       });

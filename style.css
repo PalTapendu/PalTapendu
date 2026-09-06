@@ -3103,46 +3103,75 @@ body.chat-is-open #fabHolder {
   cursor: default;
 }
 
-/* ── Notify-offer Yes/No button row (AI's proactive offer when it can't answer) */
-.notify-offer-row {
+/* ── Paired action button rows (AI fallback offer, session resume prompt, etc.) */
+.notify-offer-row,
+.chat-action-row {
   display: flex;
+  flex-direction: row;
+  align-items: center;
+  align-self: flex-start;
+  justify-content: flex-start;
   gap: 8px;
-  margin: 7px 0 2px 4px;
+  margin: 6px 0 2px 4px;
   flex-wrap: wrap;
+  width: auto;
+  max-width: 100%;
 }
 
-.notify-offer-btn {
-  padding: 5px 14px;
-  font-size: 11.5px;
+.notify-offer-btn,
+.chat-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  flex: 0 0 auto;
+  padding: 4px 12px;
+  font-size: 11px;
   font-family: 'IBM Plex Mono', monospace;
   font-weight: 500;
   border-radius: 100px;
   border: 1px solid transparent;
   cursor: pointer;
-  transition: background .15s ease, border-color .15s ease, opacity .15s ease;
+  transition: background .15s ease, border-color .15s ease, opacity .15s ease, color .15s ease;
   pointer-events: auto;
+  white-space: nowrap;
+  line-height: 1.4;
+  box-sizing: border-box;
 }
 
-.notify-offer-yes {
-  background: rgba(201, 162, 75, 0.15);
-  border-color: rgba(201, 162, 75, 0.5);
+.notify-offer-yes,
+.chat-action-primary {
+  background: rgba(201, 162, 75, 0.12);
+  border: 1px solid rgba(201, 162, 75, 0.45);
   color: var(--brass-soft);
 }
 
-.notify-offer-yes:hover {
-  background: rgba(201, 162, 75, 0.25);
+.notify-offer-yes:hover,
+.chat-action-primary:hover {
+  background: rgba(201, 162, 75, 0.22);
   border-color: var(--brass);
+  color: var(--brass-soft);
 }
 
-.notify-offer-no {
+.notify-offer-no,
+.chat-action-secondary {
   background: transparent;
-  border-color: rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.6);
 }
 
-.notify-offer-no:hover {
-  border-color: rgba(255, 255, 255, 0.28);
-  color: rgba(255, 255, 255, 0.75);
+.notify-offer-no:hover,
+.chat-action-secondary:hover {
+  border-color: rgba(255, 255, 255, 0.32);
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.notify-offer-btn:disabled,
+.chat-action-btn:disabled {
+  cursor: default;
+  opacity: 0.38;
+  pointer-events: none;
 }
 
 @media (max-width: 480px) {
