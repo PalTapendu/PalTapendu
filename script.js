@@ -1069,7 +1069,7 @@ function startNotifyFlow() {
   // reply contains any recognisable point of contact.
   async function checkHasContact(text) {
     try {
-      const resp = await fetch('https://api.tapendu.is-a.dev/api/chat', {
+      const resp = await fetch('https://pal-tapendu.vercel.app/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1249,7 +1249,7 @@ function startNotifyFlow() {
 
     // 5. Call the Vercel serverless function
     try {
-      const response = await fetch('https://api.tapendu.is-a.dev/api/chat', {
+      const response = await fetch('https://pal-tapendu.vercel.app/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
