@@ -960,7 +960,7 @@ function startNotifyFlow() {
   const chipsEl = document.getElementById('apSuggestions');
   if (chipsEl) chipsEl.style.display = 'none';
   addMsg(
-    "Sure! What's your name, and how can Tapendu best reach you back afterwards (email, phone, LinkedIn — whatever you prefer)?",
+    "Sure! Just need two quick things:\n\nName:\nContact (email, phone, or LinkedIn):",
     'bot'
   );
 }
