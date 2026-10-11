@@ -133,8 +133,34 @@ function tickCanvas() {
     ctx.shadowBlur = 0;
   }
 
-  if (!prefersReduced) requestAnimationFrame(tickCanvas);
+  if (!prefersReduced && isTabVisible && isCanvasInView) requestAnimationFrame(tickCanvas);
 }
+
+// Pause animation loops when tab is hidden or canvas is off-screen
+let isTabVisible = !document.hidden;
+let isCanvasInView = true;
+
+document.addEventListener('visibilitychange', () => {
+  const wasVisible = isTabVisible;
+  isTabVisible = !document.hidden;
+  if (!wasVisible && isTabVisible && !prefersReduced && isCanvasInView) {
+    requestAnimationFrame(tickCanvas);
+    requestAnimationFrame(blobLoop);
+  }
+});
+
+if ('IntersectionObserver' in window && canvas) {
+  const canvasObserver = new IntersectionObserver(([entry]) => {
+    const wasInView = isCanvasInView;
+    isCanvasInView = entry.isIntersecting;
+    if (!wasInView && isCanvasInView && isTabVisible && !prefersReduced) {
+      requestAnimationFrame(tickCanvas);
+      requestAnimationFrame(blobLoop);
+    }
+  }, { threshold: 0.05 });
+  canvasObserver.observe(canvas);
+}
+
 if (prefersReduced) { ctx.fillStyle = '#0A0F1C'; ctx.fillRect(0, 0, W, H); }
 else { requestAnimationFrame(tickCanvas); }
 
@@ -153,7 +179,7 @@ function blobLoop() {
     const parY = (mouse.y - innerHeight / 2 || 0) * blobFactors[i];
     b.style.transform = `translate(${floatX + parX}px, ${floatY + parY}px)`;
   });
-  if (!prefersReduced) requestAnimationFrame(blobLoop);
+  if (!prefersReduced && isTabVisible && isCanvasInView) requestAnimationFrame(blobLoop);
 }
 blobLoop();
 
@@ -454,26 +480,30 @@ document.querySelectorAll('.reveal').forEach(el => revealIO.observe(el));
 /* ============================================================
    8. 3D Tilt & Spotlight-glow cursor tracking on cards
    ============================================================ */
-document.querySelectorAll('.glow-card').forEach(card => {
-  card.addEventListener('mousemove', e => {
-    const r = card.getBoundingClientRect();
-    const x = e.clientX - r.left;
-    const y = e.clientY - r.top;
-    card.style.setProperty('--mx', (x / r.width * 100) + '%');
-    card.style.setProperty('--my', (y / r.height * 100) + '%');
+const hasFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
-    // Subtle 3D perspective tilt
-    const centerX = r.width / 2;
-    const centerY = r.height / 2;
-    const rotX = ((y - centerY) / centerY) * -3.8;
-    const rotY = ((x - centerX) / centerX) * 3.8;
-    card.style.transform = `perspective(1000px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateY(-2px)`;
-  });
+if (hasFinePointer) {
+  document.querySelectorAll('.glow-card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      const x = e.clientX - r.left;
+      const y = e.clientY - r.top;
+      card.style.setProperty('--mx', (x / r.width * 100) + '%');
+      card.style.setProperty('--my', (y / r.height * 100) + '%');
 
-  card.addEventListener('mouseleave', () => {
-    card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
+      // Subtle 3D perspective tilt
+      const centerX = r.width / 2;
+      const centerY = r.height / 2;
+      const rotX = ((y - centerY) / centerY) * -3.8;
+      const rotY = ((x - centerX) / centerX) * 3.8;
+      card.style.transform = `perspective(1000px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateY(-2px)`;
+    });
+
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
+    });
   });
-});
+}
 
 /* ============================================================
    8b. Interactive Spotlight Torch Tracking on Section Titles
@@ -526,17 +556,19 @@ torchTitles.forEach(h => torchIO.observe(h));
 /* ============================================================
    9. Fluid Magnetic buttons/links with spring physics
    ============================================================ */
-document.querySelectorAll('.magnetic, .btn-primary, .btn-ghost, .navcta').forEach(el => {
-  el.addEventListener('mousemove', e => {
-    const r = el.getBoundingClientRect();
-    const relX = e.clientX - r.left - r.width / 2;
-    const relY = e.clientY - r.top - r.height / 2;
-    el.style.transform = `translate(${relX * 0.22}px, ${relY * 0.28}px) scale(1.03)`;
+if (hasFinePointer) {
+  document.querySelectorAll('.magnetic, .btn-primary, .btn-ghost, .navcta').forEach(el => {
+    el.addEventListener('mousemove', e => {
+      const r = el.getBoundingClientRect();
+      const relX = e.clientX - r.left - r.width / 2;
+      const relY = e.clientY - r.top - r.height / 2;
+      el.style.transform = `translate(${relX * 0.22}px, ${relY * 0.28}px) scale(1.03)`;
+    });
+    el.addEventListener('mouseleave', () => {
+      el.style.transform = 'translate(0,0) scale(1)';
+    });
   });
-  el.addEventListener('mouseleave', () => {
-    el.style.transform = 'translate(0,0) scale(1)';
-  });
-});
+}
 
 /* ============================================================
    10. Scrollspy nav
@@ -840,6 +872,15 @@ const apInput = document.getElementById('apInput');
 const apSendBtn = document.getElementById('apSend');
 const apSuggestions = document.getElementById('apSuggestions');
 const initialApBodyHTML = apBody ? apBody.innerHTML : '';
+
+// ── Initialize Reusable AI Mascot Component in Corner Widget ──
+const widgetMascotContainer = document.querySelector('#assistantFab .ai-agent-icon');
+if (widgetMascotContainer && typeof window.createMascot === 'function') {
+  window.widgetMascot = window.createMascot(widgetMascotContainer, {
+    id: 'widget-mascot',
+    size: '100%'
+  });
+}
 
 // ── Panel open / close helpers (outer scope so pingBtn can reach them) ─────
 function openPanel() {
@@ -1203,6 +1244,33 @@ function startNotifyFlow() {
       notifyData.purpose = trimmed;
       chatMode = 'awaiting_submit';
 
+      // ── Spam protection ────────────────────────────────────────
+
+      // 1. URL-count guard: more than 2 URLs in the message → likely spam
+      const urlMatches = trimmed.match(/https?:\/\/\S+/gi) || [];
+      if (urlMatches.length > 2) {
+        chatMode = 'normal';
+        addMsg(
+          "That message looks like it might be spam (too many links). Please try again with a plain message.",
+          'bot'
+        );
+        return;
+      }
+
+      // 2. Client-side cooldown: block re-submissions within 2 minutes
+      const COOLDOWN_KEY = 'tapendu_notify_last_sent';
+      const COOLDOWN_MS  = 2 * 60 * 1000; // 2 minutes
+      let lastSent = 0;
+      try { lastSent = parseInt(localStorage.getItem(COOLDOWN_KEY) || '0', 10); } catch (_) {}
+      if (Date.now() - lastSent < COOLDOWN_MS) {
+        chatMode = 'normal';
+        addMsg(
+          "Please wait a moment before sending another notification — you can try again in about 2 minutes.",
+          'bot'
+        );
+        return;
+      }
+
       // ── Submit to Web3Forms directly from the browser ────────────────────
       // Web3Forms' official approach: client-side fetch is fully supported and
       // their access key is safe to expose (submission-only, not a secret).
@@ -1218,6 +1286,8 @@ function startNotifyFlow() {
           },
           body: JSON.stringify({
             access_key:  '0f94455f-0cd1-41c2-a14a-2003675beb72',
+            // 3. Honeypot field — bots fill this; Web3Forms rejects any submission where it is truthy
+            botcheck: false,
             name:    notifyData.name    || 'Unknown',
             contact: notifyData.contact || 'Not provided',
             message: notifyData.purpose,
@@ -1236,6 +1306,8 @@ function startNotifyFlow() {
         }
 
         if (succeeded) {
+          // Stamp cooldown timestamp so the form cannot be resubmitted within 2 minutes
+          try { localStorage.setItem(COOLDOWN_KEY, String(Date.now())); } catch (_) {}
           // ── Success path ───────────────────────────────────────────────────
           const confirmBubble = addMsg(
             "Done! I've sent this over to Tapendu — he'll reach out to you directly.",
@@ -1315,8 +1387,20 @@ function startNotifyFlow() {
     // 4. Show typing indicator while waiting
     showTyping();
 
+    // Check if visitor is offline before initiating request
+    if (typeof navigator !== 'undefined' && 'onLine' in navigator && !navigator.onLine) {
+      hideTyping();
+      addMsg("You appear to be offline right now. Please check your internet connection and try again.", 'bot');
+      conversationHistory.pop();
+      return;
+    }
+
     // 5. Gather fresh page context right now
     const pageContext = gatherPageContext();
+
+    // Set up request timeout (30 seconds) so typing indicator never hangs
+    const chatAbortCtrl = new AbortController();
+    const chatTimeoutId = setTimeout(() => chatAbortCtrl.abort(), 30000);
 
     // 5. Call the Vercel serverless function
     try {
@@ -1327,9 +1411,17 @@ function startNotifyFlow() {
           messages: conversationHistory,
           pageContext,
         }),
+        signal: chatAbortCtrl.signal,
       });
 
+      clearTimeout(chatTimeoutId);
       hideTyping();
+
+      if (response.status === 429) {
+        addMsg("You're asking questions a bit quickly! Please pause for a moment and try again.", 'bot');
+        conversationHistory.pop();
+        return;
+      }
 
       if (!response.ok) {
         // Try to read a structured error from the server
@@ -1413,12 +1505,18 @@ function startNotifyFlow() {
       }
 
     } catch (networkError) {
-      // fetch() threw before any HTTP response was received — likely blocked
-      // by a browser extension, firewall, or restrictive network (Case A).
-      // This is distinct from !response.ok above (Case B: server was reached
-      // but returned an error) which keeps its own neutral retry message.
       hideTyping();
-      addMsg(MSG_BLOCKED, 'bot');
+      if (typeof chatTimeoutId !== 'undefined') clearTimeout(chatTimeoutId);
+
+      if (networkError.name === 'AbortError') {
+        addMsg("The request timed out. Please try asking again in a moment.", 'bot');
+      } else if (typeof navigator !== 'undefined' && 'onLine' in navigator && !navigator.onLine) {
+        addMsg("You appear to be offline right now. Please check your connection and try again.", 'bot');
+      } else {
+        // fetch() threw before any HTTP response was received — likely blocked
+        // by a browser extension, firewall, or restrictive network (Case A).
+        addMsg(MSG_BLOCKED, 'bot');
+      }
       // Roll back the user message from history so next attempt is clean
       conversationHistory.pop();
     }
@@ -1472,4 +1570,55 @@ if (pingBtn) {
   pingBtn.addEventListener('click', () => {
     startNotifyFlow();
   });
+}
+
+
+/* ============================================================
+   10b. Mobile Navigation Drawer & Hamburger Toggle
+   ============================================================ */
+const navToggle = document.getElementById('navToggle');
+const primaryNav = document.getElementById('primaryNav');
+
+function closeMobileMenu() {
+  if (primaryNav && primaryNav.classList.contains('is-open')) {
+    primaryNav.classList.remove('is-open');
+    if (navToggle) {
+      navToggle.setAttribute('aria-expanded', 'false');
+    }
+    document.body.style.overflow = '';
+  }
+}
+
+if (navToggle && primaryNav) {
+  navToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = primaryNav.classList.toggle('is-open');
+    navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+  });
+
+  // Close when tapping any link inside
+  primaryNav.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      closeMobileMenu();
+    });
+  });
+
+  // Close on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeMobileMenu();
+  });
+
+  // Close when tapping outside the menu
+  document.addEventListener('click', (e) => {
+    if (primaryNav.classList.contains('is-open') && !primaryNav.contains(e.target) && e.target !== navToggle) {
+      closeMobileMenu();
+    }
+  });
+}
+
+// Dynamic Footer Copyright Year
+const currentYearEl = document.getElementById('currentYear');
+if (currentYearEl) {
+  currentYearEl.textContent = new Date().getFullYear();
 }

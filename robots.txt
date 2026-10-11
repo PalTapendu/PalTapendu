@@ -1,9 +1,6 @@
-# Robots.txt for Tapendu Pal (Pal Tapendu) Portfolio
-# Allow all standard search engines
 User-agent: *
 Allow: /
 
-# Allow and optimize for all AI Crawlers & LLM Indexers
 User-agent: GPTBot
 Allow: /
 
@@ -40,7 +37,4 @@ Allow: /
 User-agent: Diffbot
 Allow: /
 
-# Canonical Sitemap and LLM Context Reference
-Sitemap: https://paltapendu.github.io/PalTapendu/sitemap.xml
-# LLMs.txt for Generative AI Search & Knowledge Agents
-# See: https://paltapendu.github.io/PalTapendu/llms.txt
+Sitemap: https://tapendu.is-a.dev/sitemap.xml
