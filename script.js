@@ -1016,8 +1016,11 @@ function startNotifyFlow() {
 
   function saveChat() {
     try {
+      const safeMessages = conversationHistory.filter(
+        m => m && (m.role === 'user' || m.role === 'assistant')
+      );
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        messages: conversationHistory,
+        messages: safeMessages,
         lastActivity: Date.now(),
       }));
     } catch (_) { /* storage unavailable — silently ignore */ }
@@ -1039,7 +1042,7 @@ function startNotifyFlow() {
         localStorage.removeItem(STORAGE_KEY);
         return null;
       }
-      return parsed.messages;
+      return parsed.messages.filter(m => m && (m.role === 'user' || m.role === 'assistant'));
     } catch (_) {
       return null; // storage unavailable or JSON corrupt — start fresh
     }
@@ -1158,8 +1161,10 @@ function startNotifyFlow() {
       .map(({ id, label }) => {
         const el = document.getElementById(id);
         if (!el) return null;
-        // Collapse repeated whitespace/newlines to single spaces/newlines for cleaner context
-        const raw = (el.innerText || el.textContent || '').trim();
+        // Clone element to sanitize and strip non-public / hidden nodes
+        const clone = el.cloneNode(true);
+        clone.querySelectorAll('script, style, noscript, template, iframe, [aria-hidden="true"], [hidden]').forEach(n => n.remove());
+        const raw = (clone.innerText || '').trim();
         const cleaned = raw.replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n');
         return `${label}:\n${cleaned}`;
       })
@@ -1174,10 +1179,13 @@ function startNotifyFlow() {
   // reply contains any recognisable point of contact.
   async function checkHasContact(text) {
     try {
+      const trimmedText = (text || '').trim().slice(0, 300);
       const resp = await fetch('https://api.tapendu.is-a.dev/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          mode: 'verify_contact',
+          text: trimmedText,
           messages: [
             {
               role: 'user',
@@ -1185,10 +1193,9 @@ function startNotifyFlow() {
                 'Does the following text contain any point of contact such as an email address, ' +
                 'phone number, or a social/LinkedIn profile link? ' +
                 'Reply with only the single word YES or NO, nothing else. ' +
-                'Text: "' + text + '"',
+                'Text: "' + trimmedText + '"',
             },
           ],
-          // Minimal context — we only need a YES/NO classification
           pageContext: '',
         }),
       });
@@ -1408,7 +1415,7 @@ function startNotifyFlow() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: conversationHistory,
+          messages: conversationHistory.filter(m => m && (m.role === 'user' || m.role === 'assistant')),
           pageContext,
         }),
         signal: chatAbortCtrl.signal,
